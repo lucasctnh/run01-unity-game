@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour {
 	private const float _GROUND_CHECK_RADIUS = .2f;
 
 	private bool _isGrounded = false;
+	private float _airTime = 0;
+	private int _jumps = 1;
 
 	private void OnEnable() {
 		InputsController.OnTouchInput += Jump;
@@ -31,15 +33,36 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void FixedUpdate() {
+		OnLanding();
 		OnGround();
+		OnAir();
 	}
 
 	private void Jump() {
-		if (_isGrounded)
+		if (_jumps > 0) {
 			GetComponent<Rigidbody>().AddForce(new Vector3(0, _jumpForce, 0), ForceMode.VelocityChange);
+			_jumps--;
+		}
+	}
+
+	private void OnLanding() {
+		if (_airTime > 0 && _isGrounded) {
+			RechargeJumps();
+			_airTime = 0;
+		}
+	}
+
+	// To ensure the jump will be called only one time
+	private void RechargeJumps() {
+		_jumps = 1;
 	}
 
 	private void OnGround() {
 		_isGrounded = Physics.CheckSphere(_groundCheck.position, _GROUND_CHECK_RADIUS, _groundLayerMask);
+	}
+
+	private void OnAir() {
+		if (!_isGrounded)
+			_airTime += Time.deltaTime;
 	}
 }

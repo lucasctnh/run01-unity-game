@@ -709,4 +709,4 @@ MonoBehaviour:
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 256
-  _jumpForce: 4.5
+  _jumpForce: 8
