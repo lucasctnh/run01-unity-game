@@ -4,9 +4,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
+
 	[Header("Ground Settings")]
+	[Tooltip("Whereif the player is on ground or not")]
+	public static bool isGrounded = false;
+
 	[Tooltip("A position marking where to check if the player is grounded")]
 	[SerializeField] private Transform _groundCheck;
+
 	[Tooltip("A mask determining what is ground to the character")]
 	[SerializeField] private LayerMask _groundLayerMask;
 
@@ -17,7 +22,6 @@ public class PlayerController : MonoBehaviour {
 
 	private const float _GROUND_CHECK_RADIUS = .2f;
 
-	private bool _isGrounded = false;
 	private float _airTime = 0f;
 	private int _gravityDirection = 1;
 	private int _jumps = 1;
@@ -48,7 +52,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void OnLanding() {
-		if (_airTime > 0 && _isGrounded) {
+		if (_airTime > 0 && isGrounded) {
 			RechargeJumps();
 			_airTime = 0;
 		}
@@ -60,24 +64,24 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void OnGround() {
-		_isGrounded = Physics.CheckSphere(_groundCheck.position, _GROUND_CHECK_RADIUS, _groundLayerMask);
+		isGrounded = Physics.CheckSphere(_groundCheck.position, _GROUND_CHECK_RADIUS, _groundLayerMask);
 	}
 
 	private void OnAir() {
-		if (!_isGrounded)
+		if (!isGrounded)
 			_airTime += Time.deltaTime;
 	}
 
 	private void VerifyDrag(float yDrag) {
 		int newGravityDirection = (yDrag > 0) ? 1 : -1;
-		if (_gravityDirection != newGravityDirection && _isGrounded)
+		if (_gravityDirection != newGravityDirection && isGrounded) {
 			InvertPosition();
-
-		AssignNewGravityDirection(yDrag);
+			AssignNewGravityDirection(newGravityDirection);
+		}
 	}
 
-	private void AssignNewGravityDirection(float yDrag) {
-		_gravityDirection = (yDrag > 0) ? 1 : -1;
+	private void AssignNewGravityDirection(int newGravityDirection) {
+		_gravityDirection = newGravityDirection;
 	}
 
 	private void InvertPosition() {
