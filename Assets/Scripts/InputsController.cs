@@ -8,17 +8,23 @@ using UnityEngine.Profiling;
 public class InputsController : MonoBehaviour {
 	public static event Action OnTouchInput;
 	public static event Action OnClick;
-	public static event Action OnDrag;
+	public static event Action<float> OnDrag;
+
+	private float _yDrag = 0f;
 
 	public void TouchInput(InputAction.CallbackContext context) {
 		OnTouchInput?.Invoke();
 	}
 
 	public void Click(InputAction.CallbackContext context) {
-		OnClick?.Invoke();
+		if (context.performed)
+			OnClick?.Invoke();
 	}
 
 	public void Drag(InputAction.CallbackContext context) {
-		OnDrag?.Invoke();
+		if (context.performed)
+			_yDrag = context.ReadValue<Vector2>().y;
+		if (context.canceled && _yDrag != 0)
+			OnDrag?.Invoke(_yDrag);
 	}
 }

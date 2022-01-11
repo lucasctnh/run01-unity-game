@@ -38,7 +38,7 @@
                     "id": "6f923f35-b845-4022-ba10-2e9d29ff51d1",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "Hold(duration=0.25)"
                 },
                 {
                     "name": "Drag",
@@ -54,7 +54,7 @@
                     "name": "",
                     "id": "f969bed4-29bb-49d2-82c9-20a2cf06fb00",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "Press",
+                    "interactions": "",
                     "processors": "",
                     "groups": "Mouse",
                     "action": "Click",

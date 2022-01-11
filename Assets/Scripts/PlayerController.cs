@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
 	[Header("Ground Settings")]
@@ -17,19 +18,20 @@ public class PlayerController : MonoBehaviour {
 	private const float _GROUND_CHECK_RADIUS = .2f;
 
 	private bool _isGrounded = false;
-	private float _airTime = 0;
+	private float _airTime = 0f;
+	private int _gravityDirection = 1;
 	private int _jumps = 1;
 
 	private void OnEnable() {
-		InputsController.OnTouchInput += Jump;
+		// InputsController.OnTouchInput += Jump;
 		InputsController.OnClick += Jump;
-		// InputsController.OnDrag += ;
+		InputsController.OnDrag += VerifyDrag;
 	}
 
 	private void OnDisable() {
-		InputsController.OnTouchInput -= Jump;
+		// InputsController.OnTouchInput -= Jump;
 		InputsController.OnClick -= Jump;
-		// InputsController.OnDrag -= ;
+		InputsController.OnDrag -= VerifyDrag;
 	}
 
 	private void FixedUpdate() {
@@ -40,7 +42,7 @@ public class PlayerController : MonoBehaviour {
 
 	private void Jump() {
 		if (_jumps > 0) {
-			GetComponent<Rigidbody>().AddForce(new Vector3(0, _jumpForce, 0), ForceMode.VelocityChange);
+			GetComponent<Rigidbody>().AddForce(new Vector3(0, _jumpForce * _gravityDirection, 0), ForceMode.VelocityChange);
 			_jumps--;
 		}
 	}
@@ -64,5 +66,29 @@ public class PlayerController : MonoBehaviour {
 	private void OnAir() {
 		if (!_isGrounded)
 			_airTime += Time.deltaTime;
+	}
+
+	private void VerifyDrag(float yDrag) {
+		int newGravityDirection = (yDrag > 0) ? 1 : -1;
+		if (_gravityDirection != newGravityDirection && _isGrounded)
+			InvertPosition();
+
+		AssignNewGravityDirection(yDrag);
+	}
+
+	private void AssignNewGravityDirection(float yDrag) {
+		_gravityDirection = (yDrag > 0) ? 1 : -1;
+	}
+
+	private void InvertPosition() {
+		transform.Rotate(new Vector3(180, 0, 0), Space.Self);
+		transform.position = new Vector3(transform.position.x, transform.position.y * -1, transform.position.z);
+
+		InvertGravity();
+		RechargeJumps(); // Just in case cuz sometimes the onGround wont recharge
+	}
+
+	private void InvertGravity() {
+		Physics.gravity *= -1;
 	}
 }
