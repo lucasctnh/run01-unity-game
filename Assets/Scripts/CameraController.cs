@@ -13,12 +13,12 @@ public class CameraController : MonoBehaviour {
 
 	private void OnEnable() {
 		// InputsController.OnTouchInput += Jump;
-		InputsController.OnDrag += FollowPlayer;
+		InputsController.OnMove += FollowPlayer;
 	}
 
 	private void OnDisable() {
 		// InputsController.OnTouchInput -= Jump;
-		InputsController.OnDrag -= FollowPlayer;
+		InputsController.OnMove -= FollowPlayer;
 	}
 
 	private void Start() {

@@ -28,14 +28,14 @@ public class PlayerController : MonoBehaviour {
 
 	private void OnEnable() {
 		// InputsController.OnTouchInput += Jump;
-		InputsController.OnClick += Jump;
-		InputsController.OnDrag += VerifyDrag;
+		InputsController.OnJump += Jump;
+		InputsController.OnMove += VerifyMove;
 	}
 
 	private void OnDisable() {
 		// InputsController.OnTouchInput -= Jump;
-		InputsController.OnClick -= Jump;
-		InputsController.OnDrag -= VerifyDrag;
+		InputsController.OnJump -= Jump;
+		InputsController.OnMove -= VerifyMove;
 	}
 
 	private void FixedUpdate() {
@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour {
 			_airTime += Time.deltaTime;
 	}
 
-	private void VerifyDrag(float yDrag) {
+	private void VerifyMove(float yDrag) {
 		int newGravityDirection = (yDrag > 0) ? 1 : -1;
 		if (_gravityDirection != newGravityDirection && isGrounded) {
 			InvertPosition();
