@@ -643,11 +643,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0e83c6f20198bf4dac20d817da28ec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _obstacles:
-  - {fileID: 8093920387912335809, guid: ba790f071f2ff6c4ba5aa05fb1960d10, type: 3}
-  - {fileID: -110787456441584373, guid: 8427cf01c4394764f86b7a0974ef343d, type: 3}
-  - {fileID: -1495370633957913868, guid: 85043670cf5866045b3f3ea5f0e1db4d, type: 3}
-  - {fileID: 6470577157304439251, guid: 3c987cbb205daee4e890bb3483669efa, type: 3}
+  _obstaclePrefab: {fileID: 8093920387912335809, guid: ba790f071f2ff6c4ba5aa05fb1960d10,
+    type: 3}
+  _verticalObstaclePositions:
+  - 3.5
+  - -3.5
+  - 6.5
+  - -6.5
   _startDelay: 2
   _repeatRate: 2
 --- !u!1 &1535866014

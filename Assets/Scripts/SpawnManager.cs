@@ -4,8 +4,11 @@ using UnityEngine;
 using UnityEngine.Pool;
 
 public class SpawnManager : MonoBehaviour {
-	[Tooltip("A list of every obstacle prefab to be randonly spawned")]
-	[SerializeField] private List<Obstacle> _obstacles = new List<Obstacle>();
+	[Tooltip("The obstacle prefab")]
+	[SerializeField] private Obstacle _obstaclePrefab;
+
+	[Tooltip("A list of the possible y-axis positions for the obstacles")]
+	[SerializeField] private List<float> _verticalObstaclePositions = new List<float>();
 
 	[Tooltip("A delay time in seconds to wait before start spawning obstacles")]
 	[SerializeField] private float _startDelay = 2;
@@ -24,26 +27,22 @@ public class SpawnManager : MonoBehaviour {
 
 	private Obstacle CreateObstacle() {
 		int random = CreateRandomNumber();
-        return Instantiate(_obstacles[random], CreateRandomPosition(random), _obstacles[random].transform.rotation);
+        return Instantiate(_obstaclePrefab, CreateRandomPosition(random), _obstaclePrefab.transform.rotation);
 	}
 
 	private int CreateRandomNumber() {
-		return Random.Range(0, _obstacles.Count);
+		return Random.Range(0, _verticalObstaclePositions.Count);
 	}
 
 	private Vector3 CreateRandomPosition(int random) {
-		return new Vector3(transform.position.x, _obstacles[random].transform.position.y, _obstacles[random].transform.position.z);
+		return new Vector3(transform.position.x, _verticalObstaclePositions[random], _obstaclePrefab.transform.position.z);
 	}
 
 	private void OnGetObstacleFromPool(Obstacle obstacle) => obstacle.gameObject.SetActive(true);
 
 	private void OnReleaseObstacleToPool(Obstacle obstacle) {
-		obstacle.transform.position = ResetPosition(obstacle);
+		obstacle.transform.position = CreateRandomPosition(CreateRandomNumber());
 		obstacle.gameObject.SetActive(false);
-	}
-
-	private Vector3 ResetPosition(Obstacle obstacle) {
-		return new Vector3(transform.position.x, obstacle.transform.position.y, obstacle.transform.position.z);
 	}
 
 	private void SpawnObstacle() {
