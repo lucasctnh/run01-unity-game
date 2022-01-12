@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.unity.collab-proxy": {
-      "version": "1.15.1",
+      "version": "1.15.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -18,16 +18,16 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "2.0.7",
+      "version": "3.0.7",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.test-framework": "1.1.1"
+        "com.unity.ext.nunit": "1.0.6"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.11",
+      "version": "2.0.12",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -43,10 +43,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.0.2",
+      "version": "1.2.0",
       "depth": 0,
       "source": "registry",
-      "dependencies": {},
+      "dependencies": {
+        "com.unity.modules.uielements": "1.0.0"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.mobile.android-logcat": {
@@ -118,7 +120,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.4.8",
+      "version": "1.6.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {
