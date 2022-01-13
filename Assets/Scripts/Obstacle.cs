@@ -17,7 +17,7 @@ public class Obstacle : MonoBehaviour {
 
 	private void OnCollisionEnter(Collision other) {
 		if (other.gameObject.CompareTag("Player"))
-			Destroy(other.gameObject); // TODO: make gameover
+			GameManager.Instance.GameOver();
 		if (other.gameObject.CompareTag("Obstacle Destroyer"))
 			_killAction(this);
 	}

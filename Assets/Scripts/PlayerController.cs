@@ -39,6 +39,9 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void FixedUpdate() {
+		if (!GameManager.Instance.isGameRunning)
+			return;
+
 		OnLanding();
 		OnGround();
 		OnAir();

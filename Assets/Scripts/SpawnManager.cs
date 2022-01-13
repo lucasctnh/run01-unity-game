@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using Random = UnityEngine.Random;
 
 public class SpawnManager : MonoBehaviour {
 	[Tooltip("The obstacle prefab")]
@@ -17,17 +19,31 @@ public class SpawnManager : MonoBehaviour {
 	[SerializeField] private float _repeatRate = 2;
 
 	private ObjectPool<Obstacle> _pool;
+	private float _timer = 0f;
 
 	private void Start() {
 		_pool = new ObjectPool<Obstacle>(CreateObstacle, OnGetObstacleFromPool, OnReleaseObstacleToPool,
 		obst => Destroy(obst.gameObject), true, 6, 12);
 
-		InvokeRepeating("SpawnObstacle", _startDelay, _repeatRate);
+		_timer = _startDelay;
+	}
+
+	private void Update() {
+		if (GameManager.Instance.isGameRunning)
+			CallRepeating(SpawnObstacle);
+	}
+
+	private void CallRepeating(Action action) {
+		_timer -= Time.deltaTime;
+		if (_timer < 0) {
+			_timer = _repeatRate;
+			action();
+		}
 	}
 
 	private Obstacle CreateObstacle() {
 		int random = CreateRandomNumber();
-        return Instantiate(_obstaclePrefab, CreateRandomPosition(random), _obstaclePrefab.transform.rotation);
+		return Instantiate(_obstaclePrefab, CreateRandomPosition(random), _obstaclePrefab.transform.rotation);
 	}
 
 	private int CreateRandomNumber() {

@@ -17,11 +17,13 @@ public class InputsController : MonoBehaviour {
 	}
 
 	public void Click(InputAction.CallbackContext context) {
-		if (context.performed)
+		if (context.performed && GameManager.Instance.isGameRunning)
 			OnJump?.Invoke();
 	}
 
 	public void Drag(InputAction.CallbackContext context) {
+		if (!GameManager.Instance.isGameRunning)
+			return;
 		if (context.performed)
 			_yDrag = context.ReadValue<Vector2>().y;
 		if (context.canceled && _yDrag != 0)
@@ -29,12 +31,12 @@ public class InputsController : MonoBehaviour {
 	}
 
 	public void Jump(InputAction.CallbackContext context) {
-		if (context.performed)
+		if (context.performed && GameManager.Instance.isGameRunning)
 			OnJump?.Invoke();
 	}
 
 	public void Move(InputAction.CallbackContext context) {
-		if (context.performed) {
+		if (context.performed && GameManager.Instance.isGameRunning) {
 			_yDrag = context.ReadValue<float>();
 			if (_yDrag != 0)
 				OnMove?.Invoke(_yDrag);
