@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour {
 		InputsController.OnMove -= VerifyMove;
 	}
 
+	private void Start() => ResetGravity();
+
 	private void FixedUpdate() {
 		if (!GameManager.Instance.isGameRunning)
 			return;
@@ -62,13 +64,9 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	// To ensure the jump will be called only one time
-	private void RechargeJumps() {
-		_jumps = 1;
-	}
+	private void RechargeJumps() => _jumps = 1;
 
-	private void OnGround() {
-		isGrounded = Physics.CheckSphere(_groundCheck.position, _GROUND_CHECK_RADIUS, _groundLayerMask);
-	}
+	private void OnGround() => isGrounded = Physics.CheckSphere(_groundCheck.position, _GROUND_CHECK_RADIUS, _groundLayerMask);
 
 	private void OnAir() {
 		if (!isGrounded)
@@ -83,9 +81,7 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	private void AssignNewGravityDirection(int newGravityDirection) {
-		_gravityDirection = newGravityDirection;
-	}
+	private void AssignNewGravityDirection(int newGravityDirection) => _gravityDirection = newGravityDirection;
 
 	private void InvertPosition() {
 		transform.Rotate(new Vector3(180, 0, 0), Space.Self);
@@ -95,7 +91,10 @@ public class PlayerController : MonoBehaviour {
 		RechargeJumps(); // Just in case cuz sometimes the onGround wont recharge
 	}
 
-	private void InvertGravity() {
-		Physics.gravity *= -1;
+	private void InvertGravity() => Physics.gravity *= -1;
+
+	private void ResetGravity() {
+		if (Physics.gravity.y > 0)
+			InvertGravity();
 	}
 }
