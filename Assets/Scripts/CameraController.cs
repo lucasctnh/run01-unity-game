@@ -6,7 +6,9 @@ public class CameraController : MonoBehaviour {
 	[Tooltip("The amount of smootheness for the camera movement")]
 	[SerializeField] private float _smoothTime = .3f;
 
-	private Vector3 _playerPosition = Vector3.zero;
+	[Tooltip("The default position for when the game starts running")]
+	[SerializeField] private Vector3 _defaultPosition;
+
 	private Vector3 _targetPosition = Vector3.zero;
 	private Vector3 _velocity = Vector3.zero;
 	private int _currentDirection = 1;
@@ -21,29 +23,25 @@ public class CameraController : MonoBehaviour {
 		InputsController.OnMove -= FollowPlayer;
 	}
 
-	private void Start() {
-		_playerPosition = transform.position;
-		_targetPosition = transform.position;
-	}
+	private void Start() => _targetPosition = _defaultPosition;
 
 	private void Update() {
-		transform.position = Vector3.SmoothDamp(transform.position, _targetPosition, ref _velocity, _smoothTime);
+		if (GameManager.Instance.isGameRunning)
+			transform.position = Vector3.SmoothDamp(transform.position, _targetPosition, ref _velocity, _smoothTime);
 	}
 
 	private void FollowPlayer(float yDrag) {
 		int newDirection = (yDrag > 0) ? 1 : -1;
 		if (newDirection != _currentDirection && PlayerController.isGrounded) {
-			_targetPosition = InvertPlayerPosition();
+			_targetPosition = InvertDefaultPosition();
 			AssignNewDirection(newDirection);
 		}
 	}
 
-	private void AssignNewDirection(int newDirection) {
-		_currentDirection = newDirection;
-	}
+	private void AssignNewDirection(int newDirection) => _currentDirection = newDirection;
 
-	private Vector3 InvertPlayerPosition() {
-		_playerPosition = new Vector3(_playerPosition.x, _playerPosition.y * -1, _playerPosition.z);
-		return _playerPosition;
+	private Vector3 InvertDefaultPosition() {
+		_defaultPosition = new Vector3(_defaultPosition.x, _defaultPosition.y * -1, _defaultPosition.z);
+		return _defaultPosition;
 	}
 }
