@@ -14,12 +14,14 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private GameObject _gameOverMenu;
 	[SerializeField] private GameObject _gameUI;
 	[SerializeField] private TMP_Text _scoreText;
+	[SerializeField] private TMP_Text _coinText;
 
 	[Tooltip("Threshold amount in seconds which the score will keep increasing")]
 	[SerializeField] private float _scoreRate = 1f;
 
 	private float _timer = 0f;
 	private int _score = 0;
+	private int _coin = 0;
 
 	private void Awake() {
 		if (Instance != null) {
@@ -61,6 +63,11 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void PlayAgain() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+	public void IncreaseCoin() {
+		_coin++;
+		_coinText.text = "x " + _coin;
+	}
 
 	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
 		_menu.SetActive(mainVisibility);

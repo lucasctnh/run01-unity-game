@@ -30,9 +30,11 @@ public class CameraController : MonoBehaviour {
 			transform.position = Vector3.SmoothDamp(transform.position, _targetPosition, ref _velocity, _smoothTime);
 	}
 
+	public void InvertCamera() => _targetPosition = InvertDefaultPosition();
+
 	private void FollowPlayer(float yDrag) {
 		int newDirection = (yDrag > 0) ? 1 : -1;
-		if (newDirection != _currentDirection && PlayerController.isGrounded) {
+		if (newDirection != _currentDirection && PlayerController.IsGrounded) {
 			_targetPosition = InvertDefaultPosition();
 			AssignNewDirection(newDirection);
 		}

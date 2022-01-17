@@ -3,34 +3,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
-using Random = UnityEngine.Random;
 
 public class SpawnManager : MonoBehaviour {
-	[Tooltip("The obstacle prefab")]
-	[SerializeField] private Obstacle _obstaclePrefab;
+	[Tooltip("The hitable prefab")]
+	[SerializeField] private Hitable _hitablePrefab;
 
-	[Tooltip("A list of the possible y-axis positions for the obstacles")]
-	[SerializeField] private List<float> _verticalObstaclePositions = new List<float>();
-
-	[Tooltip("A delay time in seconds to wait before start spawning obstacles")]
+	[Tooltip("A delay time in seconds to wait before start spawning collectables")]
 	[SerializeField] private float _startDelay = 2;
 
 	[Tooltip("The time in seconds in which the spawn will keep repeating")]
 	[SerializeField] private float _repeatRate = 2;
 
-	private ObjectPool<Obstacle> _pool;
+	private ObjectPool<Hitable> _pool;
 	private float _timer = 0f;
 
 	private void Start() {
-		_pool = new ObjectPool<Obstacle>(CreateObstacle, OnGetObstacleFromPool, OnReleaseObstacleToPool,
-		obst => Destroy(obst.gameObject), true, 6, 12);
+		_pool = new ObjectPool<Hitable>(CreateHitable, OnGetHitableFromPool, OnReleaseHitableToPool,
+		hitable => Destroy(hitable.gameObject), true, 6, 12);
 
 		_timer = _startDelay;
 	}
 
 	private void Update() {
 		if (GameManager.Instance.isGameRunning)
-			CallRepeating(SpawnObstacle);
+			CallRepeating(SpawnHitable);
 	}
 
 	private void CallRepeating(Action action) {
@@ -41,30 +37,25 @@ public class SpawnManager : MonoBehaviour {
 		}
 	}
 
-	private Obstacle CreateObstacle() {
-		int random = CreateRandomNumber();
-		return Instantiate(_obstaclePrefab, CreateRandomPosition(random), _obstaclePrefab.transform.rotation);
+	private Hitable CreateHitable() {
+		return Instantiate(_hitablePrefab, CreateRandomPosition(_hitablePrefab), _hitablePrefab.transform.rotation);
 	}
 
-	private int CreateRandomNumber() {
-		return Random.Range(0, _verticalObstaclePositions.Count);
+	private Vector3 CreateRandomPosition(Hitable hitable) {
+		return hitable.CreateRandomPosition();
 	}
 
-	private Vector3 CreateRandomPosition(int random) {
-		return new Vector3(transform.position.x, _verticalObstaclePositions[random], _obstaclePrefab.transform.position.z);
+	private void OnGetHitableFromPool(Hitable hitable) => hitable.gameObject.SetActive(true);
+
+	private void OnReleaseHitableToPool(Hitable hitable) {
+		hitable.transform.position = CreateRandomPosition(hitable);
+		hitable.gameObject.SetActive(false);
 	}
 
-	private void OnGetObstacleFromPool(Obstacle obstacle) => obstacle.gameObject.SetActive(true);
-
-	private void OnReleaseObstacleToPool(Obstacle obstacle) {
-		obstacle.transform.position = CreateRandomPosition(CreateRandomNumber());
-		obstacle.gameObject.SetActive(false);
+	private void SpawnHitable() {
+		Hitable hitable = _pool.Get();
+		hitable.GetComponent<Hitable>().SetKill(Kill);
 	}
 
-	private void SpawnObstacle() {
-		Obstacle obstacle = _pool.Get();
-		obstacle.GetComponent<Obstacle>().SetKill(Kill);
-	}
-
-	private void Kill(Obstacle obstacle) => _pool.Release(obstacle);
+	private void Kill(Hitable hitable) => _pool.Release(hitable);
 }

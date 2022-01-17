@@ -4,11 +4,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
+	public static bool IsGrounded { get; private set; }
 
 	[Header("Ground Settings")]
-	[Tooltip("Whereif the player is on ground or not")]
-	public static bool isGrounded = false;
-
 	[Tooltip("A position marking where to check if the player is grounded")]
 	[SerializeField] private Transform _groundCheck;
 
@@ -19,6 +17,10 @@ public class PlayerController : MonoBehaviour {
 	[Space]
 	[Tooltip("Amount of force added when the player jumps")]
 	[SerializeField] private float _jumpForce = 10f;
+
+	[Header("Components Reference")]
+	[Space]
+	[SerializeField] private CameraController _camera;
 
 	private const float _GROUND_CHECK_RADIUS = .2f;
 
@@ -49,6 +51,21 @@ public class PlayerController : MonoBehaviour {
 		OnAir();
 	}
 
+	public void ButtonJump() {
+		if (_jumps > 0) {
+			GetComponent<Rigidbody>().AddForce(new Vector3(0, _jumpForce * _gravityDirection, 0), ForceMode.VelocityChange);
+			_jumps--;
+		}
+	}
+
+	public void ButtonMove() {
+		if (IsGrounded) {
+			InvertPosition();
+			_gravityDirection *= -1;
+			_camera.InvertCamera();
+		}
+	}
+
 	private void Jump() {
 		if (_jumps > 0) {
 			GetComponent<Rigidbody>().AddForce(new Vector3(0, _jumpForce * _gravityDirection, 0), ForceMode.VelocityChange);
@@ -57,7 +74,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void OnLanding() {
-		if (_airTime > 0 && isGrounded) {
+		if (_airTime > 0 && IsGrounded) {
 			RechargeJumps();
 			_airTime = 0;
 		}
@@ -66,16 +83,16 @@ public class PlayerController : MonoBehaviour {
 	// To ensure the jump will be called only one time
 	private void RechargeJumps() => _jumps = 1;
 
-	private void OnGround() => isGrounded = Physics.CheckSphere(_groundCheck.position, _GROUND_CHECK_RADIUS, _groundLayerMask);
+	private void OnGround() => IsGrounded = Physics.CheckSphere(_groundCheck.position, _GROUND_CHECK_RADIUS, _groundLayerMask);
 
 	private void OnAir() {
-		if (!isGrounded)
+		if (!IsGrounded)
 			_airTime += Time.deltaTime;
 	}
 
 	private void VerifyMove(float yDrag) {
 		int newGravityDirection = (yDrag > 0) ? 1 : -1;
-		if (_gravityDirection != newGravityDirection && isGrounded) {
+		if (_gravityDirection != newGravityDirection && IsGrounded) {
 			InvertPosition();
 			AssignNewGravityDirection(newGravityDirection);
 		}

@@ -2,23 +2,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public class Obstacle : MonoBehaviour {
-	[Tooltip("The velocity which the obstacle will continuously move towards the player")]
-	[SerializeField] private float _moveLeftVelocity = 20f;
+public class Obstacle : Hitable {
+	[Tooltip("The x-axis position for the obstacles spawn")]
+	[SerializeField] private float _horizontalPosition;
 
-	private Action<Obstacle> _killAction;
 
-	private void Update() {
-		transform.Translate(Vector3.left * _moveLeftVelocity * Time.deltaTime, Space.World);
-	}
+	[Tooltip("A list of the possible y-axis positions for the obstacles")]
+	[SerializeField] private List<float> _verticalPositions = new List<float>();
 
-	public void SetKill(Action<Obstacle> killAction) => _killAction = killAction;
-
-	private void OnCollisionEnter(Collision other) {
+	protected override void OnCollisionEnter(Collision other) {
 		if (other.gameObject.CompareTag("Player"))
 			GameManager.Instance.GameOver();
 		if (other.gameObject.CompareTag("Obstacle Destroyer"))
 			_killAction(this);
+	}
+
+	private int CreateRandomNumber() {
+		return Random.Range(0, _verticalPositions.Count);
+	}
+
+	public override Vector3 CreateRandomPosition() {
+		return new Vector3(_horizontalPosition, _verticalPositions[CreateRandomNumber()], transform.position.z);
 	}
 }
