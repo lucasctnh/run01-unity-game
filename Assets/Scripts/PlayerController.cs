@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour {
 	private void Start() => ResetGravity();
 
 	private void FixedUpdate() {
-		if (!GameManager.Instance.isGameRunning)
+		if (!GameManager.Instance.isGameRunning || GameManager.Instance.isGamePaused)
 			return;
 
 		OnLanding();
@@ -52,14 +52,14 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void ButtonJump() {
-		if (_jumps > 0) {
+		if (_jumps > 0 && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
 			GetComponent<Rigidbody>().AddForce(new Vector3(0, _jumpForce * _gravityDirection, 0), ForceMode.VelocityChange);
 			_jumps--;
 		}
 	}
 
 	public void ButtonMove() {
-		if (IsGrounded) {
+		if (IsGrounded && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
 			InvertPosition();
 			_gravityDirection *= -1;
 			_camera.InvertCamera();

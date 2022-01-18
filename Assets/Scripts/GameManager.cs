@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,16 +7,18 @@ using TMPro;
 
 public class GameManager : MonoBehaviour {
 	public static GameManager Instance;
+	public static event Action OnPlay;
+	public static event Action OnPause;
+	public static event Action<bool> OnGameOver;
+	public static event Action<SaveData> OnAssignSaveData;
+	public static event Action<int> OnUpdateBestScore;
+	public static event Action<int> OnUpdateScore;
+	public static event Action<int> OnUpdateCoins;
+	public static event Action<int> OnUpdateFinalScore;
 
 	public bool isGameRunning = false;
+	public bool isGamePaused = false;
 
-	[SerializeField] private GameObject _menu;
-	[SerializeField] private GameObject _pauseMenu;
-	[SerializeField] private GameObject _gameOverMenu;
-	[SerializeField] private GameObject _gameUI;
-	[SerializeField] private TMP_Text _bestScoreText;
-	[SerializeField] private TMP_Text _scoreText;
-	[SerializeField] private TMP_Text _coinsText;
 
 	[Tooltip("Threshold amount in seconds which the score will keep increasing")]
 	[SerializeField] private float _scoreRate = 1f;
@@ -40,37 +43,36 @@ public class GameManager : MonoBehaviour {
 			AssignSaveData(data);
 
 		UnfreezeTime();
-		SetMenusVisibility(true, false, false);
 	}
 
 	private void Update() {
 		if (isGameRunning)
 			HandleScore();
-
-		_gameUI.SetActive(isGameRunning);
 	}
 
 	public void Play() {
 		isGameRunning = true;
-		SetMenusVisibility(false, false, false);
+		isGamePaused = false;
+		OnPlay?.Invoke();
 
 		UnfreezeTime();
 	}
 
-	public void GameOver() {
-		isGameRunning = false;
-		SetMenusVisibility(false, false, true);
-
-		if (IsThereNewBestScore())
-			UpdateBestScore();
-		SaveSystem.Save(_bestScore, _coins);
+	public void Pause() {
+		isGameRunning = true;
+		isGamePaused = true;
+		OnPause?.Invoke();
 
 		FreezeTime();
 	}
 
-	public void Pause() {
+	public void GameOver() {
 		isGameRunning = false;
-		SetMenusVisibility(false, true, false);
+		isGamePaused = true;
+		OnGameOver?.Invoke(IsThereNewBestScore());
+		OnUpdateFinalScore?.Invoke(_score);
+
+		SaveSystem.Save(_bestScore, _coins);
 
 		FreezeTime();
 	}
@@ -79,38 +81,24 @@ public class GameManager : MonoBehaviour {
 
 	public void IncreaseCoin() {
 		_coins++;
-		UpdateCoins();
+		OnUpdateCoins?.Invoke(_coins);
 	}
 
 	private void AssignSaveData(SaveData data) {
 		_bestScore = data.bestScore;
 		_coins = data.coins;
 
-		UpdateSavedPoints();
+		OnAssignSaveData?.Invoke(data);
 	}
-
-	private void UpdateSavedPoints() {
-		UpdateCoins();
-		UpdateBestScore();
-	}
-
-	private void UpdateCoins() => _coinsText.text = "x " + _coins;
-
-	private void UpdateBestScore() => _bestScoreText.text = "Best: " + _bestScore;
 
 	private bool IsThereNewBestScore() {
 		if (_score > _bestScore) {
 			_bestScore = _score;
+			OnUpdateBestScore?.Invoke(_bestScore);
 			return true;
 		}
 		else
 			return false;
-	}
-
-	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
-		_menu.SetActive(mainVisibility);
-		_pauseMenu.SetActive(pauseVisibility);
-		_gameOverMenu.SetActive(gameOverVisibility);
 	}
 
 	private void FreezeTime() => Time.timeScale = 0f;
@@ -127,8 +115,6 @@ public class GameManager : MonoBehaviour {
 
 	private void IncreaseScore() {
 		_score++;
-		UpdateScore();
+		OnUpdateScore?.Invoke(_score);
 	}
-
-	private void UpdateScore() => _scoreText.text = "Score: " + _score;
 }

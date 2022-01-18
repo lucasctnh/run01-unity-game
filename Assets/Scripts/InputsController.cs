@@ -17,12 +17,12 @@ public class InputsController : MonoBehaviour {
 	}
 
 	public void Click(InputAction.CallbackContext context) {
-		if (context.performed && GameManager.Instance.isGameRunning)
+		if (context.performed && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused)
 			OnJump?.Invoke();
 	}
 
 	public void Drag(InputAction.CallbackContext context) {
-		if (!GameManager.Instance.isGameRunning)
+		if (!GameManager.Instance.isGameRunning || GameManager.Instance.isGamePaused)
 			return;
 		if (context.performed)
 			_yDrag = context.ReadValue<Vector2>().y;
@@ -31,12 +31,12 @@ public class InputsController : MonoBehaviour {
 	}
 
 	public void Jump(InputAction.CallbackContext context) {
-		if (context.performed && GameManager.Instance.isGameRunning)
+		if (context.performed && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused)
 			OnJump?.Invoke();
 	}
 
 	public void Move(InputAction.CallbackContext context) {
-		if (context.performed && GameManager.Instance.isGameRunning) {
+		if (context.performed && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
 			_yDrag = context.ReadValue<float>();
 			if (_yDrag != 0)
 				OnMove?.Invoke(_yDrag);
