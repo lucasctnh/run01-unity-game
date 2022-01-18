@@ -13,15 +13,17 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private GameObject _pauseMenu;
 	[SerializeField] private GameObject _gameOverMenu;
 	[SerializeField] private GameObject _gameUI;
+	[SerializeField] private TMP_Text _bestScoreText;
 	[SerializeField] private TMP_Text _scoreText;
-	[SerializeField] private TMP_Text _coinText;
+	[SerializeField] private TMP_Text _coinsText;
 
 	[Tooltip("Threshold amount in seconds which the score will keep increasing")]
 	[SerializeField] private float _scoreRate = 1f;
 
 	private float _timer = 0f;
 	private int _score = 0;
-	private int _coin = 0;
+	private int _bestScore = 0;
+	private int _coins = 0;
 
 	private void Awake() {
 		if (Instance != null) {
@@ -32,7 +34,14 @@ public class GameManager : MonoBehaviour {
 		Instance = this;
 	}
 
-	private void Start() => UnfreezeTime();
+	private void Start() {
+		SaveData data = SaveSystem.Load();
+		if (data != null)
+			AssignSaveData(data);
+
+		UnfreezeTime();
+		SetMenusVisibility(true, false, false);
+	}
 
 	private void Update() {
 		if (isGameRunning)
@@ -52,6 +61,10 @@ public class GameManager : MonoBehaviour {
 		isGameRunning = false;
 		SetMenusVisibility(false, false, true);
 
+		if (IsThereNewBestScore())
+			UpdateBestScore();
+		SaveSystem.Save(_bestScore, _coins);
+
 		FreezeTime();
 	}
 
@@ -65,8 +78,33 @@ public class GameManager : MonoBehaviour {
 	public void PlayAgain() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 
 	public void IncreaseCoin() {
-		_coin++;
-		_coinText.text = "x " + _coin;
+		_coins++;
+		UpdateCoins();
+	}
+
+	private void AssignSaveData(SaveData data) {
+		_bestScore = data.bestScore;
+		_coins = data.coins;
+
+		UpdateSavedPoints();
+	}
+
+	private void UpdateSavedPoints() {
+		UpdateCoins();
+		UpdateBestScore();
+	}
+
+	private void UpdateCoins() => _coinsText.text = "x " + _coins;
+
+	private void UpdateBestScore() => _bestScoreText.text = "Best: " + _bestScore;
+
+	private bool IsThereNewBestScore() {
+		if (_score > _bestScore) {
+			_bestScore = _score;
+			return true;
+		}
+		else
+			return false;
 	}
 
 	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
@@ -89,6 +127,8 @@ public class GameManager : MonoBehaviour {
 
 	private void IncreaseScore() {
 		_score++;
-		_scoreText.text = "Score: " + _score;
+		UpdateScore();
 	}
+
+	private void UpdateScore() => _scoreText.text = "Score: " + _score;
 }
