@@ -1,10 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
 public class UIManager : MonoBehaviour {
-	[SerializeField] private GameObject _menu;
+	public static event Action<bool> OnChangeSkin;
+
+	[SerializeField] private GameObject _initMenu;
+	[SerializeField] private TMP_Text _initBestScoreText;
+	[SerializeField] private TMP_Text _initCoinsText;
 	[SerializeField] private GameObject _pauseMenu;
 	[SerializeField] private GameObject _gameOverMenu;
 	[SerializeField] private GameObject _withNewBestScoreGroup;
@@ -41,6 +46,10 @@ public class UIManager : MonoBehaviour {
 
 	private void Update() => _gameUI.SetActive(GameManager.Instance.isGameRunning);
 
+	public void ChangeSkinByLeft() => OnChangeSkin?.Invoke(false);
+
+	public void ChangeSkinByRight() => OnChangeSkin?.Invoke(true);
+
 	private void OnPlay() => SetMenusVisibility(false, false, false);
 
 	private void OnPause() => SetMenusVisibility(false, true, false);
@@ -51,14 +60,19 @@ public class UIManager : MonoBehaviour {
 	}
 
 	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
-		_menu.SetActive(mainVisibility);
-		_pauseMenu.SetActive(pauseVisibility);
-		_gameOverMenu.SetActive(gameOverVisibility);
+		if (_initMenu != null)
+			_initMenu.SetActive(mainVisibility);
+		if (_pauseMenu != null)
+			_pauseMenu.SetActive(pauseVisibility);
+		if (_gameOverMenu != null)
+			_gameOverMenu.SetActive(gameOverVisibility);
 	}
 
 	private void ShowScoreGroup(bool isThereNewBestScore) {
-		_withNewBestScoreGroup.SetActive(isThereNewBestScore);
-		_belowBestScoreGroup.SetActive(!isThereNewBestScore);
+		if (_withNewBestScoreGroup != null)
+			_withNewBestScoreGroup.SetActive(isThereNewBestScore);
+		if (_belowBestScoreGroup != null)
+			_belowBestScoreGroup.SetActive(!isThereNewBestScore);
 	}
 
 	private void UpdateSavedPoints(SaveData data) {
@@ -66,9 +80,15 @@ public class UIManager : MonoBehaviour {
 		UpdateBestScore(data.bestScore);
 	}
 
-	private void UpdateCoins(int coins) => _coinsText.text = "x " + coins;
+	private void UpdateCoins(int coins) {
+		_initCoinsText.text = "x " + coins;
+		_coinsText.text = "x " + coins;
+	}
 
-	private void UpdateBestScore(int bestScore) => _bestScoreText.text = "Best: " + bestScore;
+	private void UpdateBestScore(int bestScore) {
+		 _initBestScoreText.text = "Best: " + bestScore;
+		 _bestScoreText.text = "Best: " + bestScore;
+	}
 
 	private void UpdateScore(int score) => _scoreText.text = "Score: " + score;
 

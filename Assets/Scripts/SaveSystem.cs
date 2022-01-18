@@ -4,14 +4,25 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public static class SaveSystem {
+public static class SaveSystem { // TODO: refactor
 	private static string _path = Application.persistentDataPath + "/save.lrn";
+	private static string _skinPath = Application.persistentDataPath + "/sk-save.lrn";
 
 	public static void Save(int score, int coins) {
 		BinaryFormatter formatter = new BinaryFormatter();
 		FileStream stream = new FileStream(_path, FileMode.Create);
 
 		SaveData data = new SaveData(score, coins);
+
+		formatter.Serialize(stream, data);
+		stream.Close();
+	}
+
+	public static void SaveSkins(bool[] skinsUnlocked) {
+		BinaryFormatter formatter = new BinaryFormatter();
+		FileStream stream = new FileStream(_skinPath, FileMode.Create);
+
+		SkinsSaveData data = new SkinsSaveData(skinsUnlocked);
 
 		formatter.Serialize(stream, data);
 		stream.Close();
@@ -28,6 +39,21 @@ public static class SaveSystem {
 			return data;
 		} else {
 			Debug.LogError("Save file not found in " + _path);
+			return null;
+		}
+	}
+
+	public static SkinsSaveData LoadSkins() {
+		if (File.Exists(_skinPath)) {
+			BinaryFormatter formatter = new BinaryFormatter();
+			FileStream stream = new FileStream(_skinPath, FileMode.Open);
+
+			SkinsSaveData data = formatter.Deserialize(stream) as SkinsSaveData;
+			stream.Close();
+
+			return data;
+		} else {
+			Debug.LogError("Save file not found in " + _skinPath);
 			return null;
 		}
 	}

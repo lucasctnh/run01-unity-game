@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour {
 	public static event Action<int> OnUpdateCoins;
 	public static event Action<int> OnUpdateFinalScore;
 
+	public int BestScore { get { return _bestScore; } }
+	public int Coins { get { return _coins; } }
+
 	public bool isGameRunning = false;
 	public bool isGamePaused = false;
 
@@ -51,6 +54,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void Play() {
+		if (!SkinsSystem.isCurrentSkinUnlocked)
+			return; // TODO: disable button
+
 		isGameRunning = true;
 		isGamePaused = false;
 		OnPlay?.Invoke();
@@ -82,6 +88,13 @@ public class GameManager : MonoBehaviour {
 	public void IncreaseCoin() {
 		_coins++;
 		OnUpdateCoins?.Invoke(_coins);
+	}
+
+	public void SpendCoins(int price) {
+		_coins -= price;
+		OnUpdateCoins?.Invoke(_coins);
+
+		SaveSystem.Save(_bestScore, _coins);
 	}
 
 	private void AssignSaveData(SaveData data) {
