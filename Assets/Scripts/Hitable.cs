@@ -11,7 +11,7 @@ public abstract class Hitable : MonoBehaviour {
 
 	private void Update() => transform.Translate(Vector3.left * _moveLeftVelocity * Time.deltaTime, Space.World);
 
-	protected abstract void OnCollisionEnter(Collision other);
+	protected abstract void OnTriggerEnter(Collider other);
 
 	public void SetKill(Action<Hitable> killAction) => _killAction = killAction;
 

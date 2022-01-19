@@ -12,7 +12,7 @@ public class Obstacle : Hitable {
 	[Tooltip("A list of the possible y-axis positions for the obstacles")]
 	[SerializeField] private List<float> _verticalPositions = new List<float>();
 
-	protected override void OnCollisionEnter(Collision other) {
+	protected override void OnTriggerEnter(Collider other) {
 		if (other.gameObject.CompareTag("Player"))
 			GameManager.Instance.GameOver();
 		if (other.gameObject.CompareTag("Obstacle Destroyer"))

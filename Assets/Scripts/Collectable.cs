@@ -12,7 +12,7 @@ public class Collectable : Hitable {
 	[Tooltip("The maximum positions of the area where the collectable can spawn")]
 	[SerializeField] private Vector2 _max;
 
-	protected override void OnCollisionEnter(Collision other) {
+	protected override void OnTriggerEnter(Collider other) {
 		if (other.gameObject.CompareTag("Player")) {
 			_killAction(this);
 			GameManager.Instance.IncreaseCoin();
