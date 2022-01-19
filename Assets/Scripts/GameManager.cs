@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour {
 	[Tooltip("Threshold amount in seconds which the score will keep increasing")]
 	[SerializeField] private float _scoreRate = 1f;
 
+	[SerializeField] private int _targetFrameRate = 60;
+
 	private float _timer = 0f;
 	private int _score = 0;
 	private int _bestScore = 0;
@@ -38,6 +40,8 @@ public class GameManager : MonoBehaviour {
 		}
 
 		Instance = this;
+
+		LimitFrameRate();
 	}
 
 	private void Start() {
@@ -95,6 +99,11 @@ public class GameManager : MonoBehaviour {
 		OnUpdateCoins?.Invoke(_coins);
 
 		SaveSystem.Save(_bestScore, _coins);
+	}
+
+	private void LimitFrameRate() {
+		QualitySettings.vSyncCount = 0;
+		Application.targetFrameRate = _targetFrameRate;
 	}
 
 	private void AssignSaveData(SaveData data) {
