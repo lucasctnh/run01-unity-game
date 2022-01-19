@@ -4078,7 +4078,9 @@ MonoBehaviour:
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 256
-  _jumpForce: 12
+  _jumpForce: 12.7
+  _lowJumpMultiplier: 2
+  _fallMultiplier: 3.5
   _camera: {fileID: 963194229}
 --- !u!1 &1578617822
 GameObject:

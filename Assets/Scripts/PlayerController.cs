@@ -18,6 +18,12 @@ public class PlayerController : MonoBehaviour {
 	[Tooltip("Amount of force added when the player jumps")]
 	[SerializeField] private float _jumpForce = 10f;
 
+	[Tooltip("Amount of force multiplied in gravity when player is falling and not holding jump")]
+	[SerializeField] private float _lowJumpMultiplier = 2f;
+
+	[Tooltip("Amount of force multiplied in gravity when player is falling")]
+	[SerializeField] private float _fallMultiplier = 2.5f;
+
 	[Header("Components Reference")]
 	[Space]
 	[SerializeField] private CameraController _camera;
@@ -27,6 +33,7 @@ public class PlayerController : MonoBehaviour {
 	private float _airTime = 0f;
 	private int _gravityDirection = 1;
 	private int _jumps = 1;
+	private bool _isHoldingJump = false;
 
 	private void OnEnable() {
 		// InputsController.OnTouchInput += Jump;
@@ -46,6 +53,7 @@ public class PlayerController : MonoBehaviour {
 		if (!GameManager.Instance.isGameRunning || GameManager.Instance.isGamePaused)
 			return;
 
+		HandleGravity();
 		OnLanding();
 		OnGround();
 		OnAir();
@@ -53,7 +61,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void ButtonJump() {
 		if (_jumps > 0 && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
-			GetComponent<Rigidbody>().AddForce(new Vector3(0, _jumpForce * _gravityDirection, 0), ForceMode.VelocityChange);
+			GetComponent<Rigidbody>().AddForce(Vector3.up * _jumpForce * _gravityDirection, ForceMode.VelocityChange);
 			_jumps--;
 		}
 	}
@@ -66,11 +74,28 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	private void Jump() {
-		if (_jumps > 0) {
-			GetComponent<Rigidbody>().AddForce(new Vector3(0, _jumpForce * _gravityDirection, 0), ForceMode.VelocityChange);
-			_jumps--;
+	private void HandleGravity() {
+		Rigidbody rb = GetComponent<Rigidbody>();
+		if (_gravityDirection == 1) {
+			if (rb.velocity.y < 0)
+				ApplyCustomGravityFall(rb);
+			// else if (rb.velocity.y > 0 && !_isHoldingJump) // TODO: figure a way to implement this shit later
+			// 	ApplyCustomGravityLowJumpFall(rb);
 		}
+		else {
+			if (rb.velocity.y > 0)
+				ApplyCustomGravityFall(rb);
+			// else if (rb.velocity.y < 0 && !_isHoldingJump)
+			// 	ApplyCustomGravityLowJumpFall(rb);
+		}
+	}
+
+	private void ApplyCustomGravityFall(Rigidbody rb) {
+		rb.velocity += Vector3.up * Physics.gravity.y * (_fallMultiplier - 1) * Time.deltaTime;
+	}
+
+	private void ApplyCustomGravityLowJumpFall(Rigidbody rb) {
+		rb.velocity += Vector3.up * Physics.gravity.y * (_lowJumpMultiplier - 1) * Time.deltaTime;
 	}
 
 	private void OnLanding() {
@@ -88,6 +113,13 @@ public class PlayerController : MonoBehaviour {
 	private void OnAir() {
 		if (!IsGrounded)
 			_airTime += Time.deltaTime;
+	}
+
+	private void Jump() {
+		if (_jumps > 0) {
+			GetComponent<Rigidbody>().AddForce(Vector3.up * _jumpForce * _gravityDirection, ForceMode.VelocityChange);
+			_jumps--;
+		}
 	}
 
 	private void VerifyMove(float yDrag) {
