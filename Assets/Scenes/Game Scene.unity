@@ -2711,7 +2711,6 @@ MonoBehaviour:
     type: 3}
   _startDelay: 5.1
   _repeatRate: 12.4
-  _speedIncrease: 0.2
 --- !u!114 &1105608150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2728,7 +2727,6 @@ MonoBehaviour:
     type: 3}
   _startDelay: 2
   _repeatRate: 2
-  _speedIncrease: 0.2
 --- !u!1 &1167456262
 GameObject:
   m_ObjectHideFlags: 0
@@ -5370,6 +5368,9 @@ MonoBehaviour:
   isGameRunning: 0
   isGamePaused: 0
   _scoreRate: 1
+  _increaseDificultyRate: 2
+  _speedIncrease: 0.25
+  _targetFrameRate: 60
 --- !u!1 &1931181065
 GameObject:
   m_ObjectHideFlags: 0

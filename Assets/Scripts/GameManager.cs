@@ -26,12 +26,27 @@ public class GameManager : MonoBehaviour {
 	[Tooltip("Threshold amount in seconds which the score will keep increasing")]
 	[SerializeField] private float _scoreRate = 1f;
 
+	[Tooltip("Amount in seconds which the score will keep increasing")]
+	[SerializeField] private float _increaseDificultyRate = 2f;
+
+	[Tooltip("Amount of speed which the hitable object will increase over time")]
+	[SerializeField] private float _speedIncrease = .5f;
+
 	[SerializeField] private int _targetFrameRate = 60;
 
-	private float _timer = 0f;
+	private float _difficultyTimer = 0f;
+	private float _scoreTimer = 0f;
 	private int _score = 0;
 	private int _bestScore = 0;
 	private int _coins = 0;
+
+	public static void CallRepeating(Action action, ref float timer, float repeatRate) {
+		timer -= Time.deltaTime;
+		if (timer < 0) {
+			timer = repeatRate;
+			action();
+		}
+	}
 
 	private void Awake() {
 		if (Instance != null) {
@@ -54,8 +69,10 @@ public class GameManager : MonoBehaviour {
 
 	private void Update() {
 		if (isGameRunning)
-			HandleScore();
+			CallRepeating(IncreaseScore, ref _scoreTimer, _scoreRate);
 	}
+
+	private void LateUpdate() => CallRepeating(IncreaseDificulty, ref _difficultyTimer, _increaseDificultyRate);
 
 	public void Play() {
 		if (!SkinsSystem.isCurrentSkinUnlocked)
@@ -127,16 +144,10 @@ public class GameManager : MonoBehaviour {
 
 	private void UnfreezeTime() => Time.timeScale = 1f;
 
-	private void HandleScore() {
-		_timer += Time.deltaTime;
-		if (_timer > _scoreRate) {
-			_timer = 0f;
-			IncreaseScore();
-		}
-	}
-
 	private void IncreaseScore() {
 		_score++;
 		OnUpdateScore?.Invoke(_score);
 	}
+
+	private void IncreaseDificulty() => Hitable.moveLeftVelocity += _speedIncrease;
 }

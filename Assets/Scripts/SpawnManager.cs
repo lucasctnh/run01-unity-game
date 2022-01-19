@@ -14,9 +14,6 @@ public class SpawnManager : MonoBehaviour {
 	[Tooltip("The time in seconds in which the spawn will keep repeating")]
 	[SerializeField] private float _repeatRate = 2;
 
-	[Tooltip("Amount of speed which the hitable object will increase over time")]
-	[SerializeField] private float _speedIncrease = .5f;
-
 	private ObjectPool<Hitable> _pool;
 	private float _timer = 0f;
 
@@ -29,15 +26,7 @@ public class SpawnManager : MonoBehaviour {
 
 	private void Update() {
 		if (GameManager.Instance.isGameRunning)
-			CallRepeating(SpawnHitable);
-	}
-
-	private void CallRepeating(Action action) {
-		_timer -= Time.deltaTime;
-		if (_timer < 0) {
-			_timer = _repeatRate;
-			action();
-		}
+			GameManager.CallRepeating(SpawnHitable, ref _timer, _repeatRate);
 	}
 
 	private Hitable CreateHitable() {
@@ -57,7 +46,6 @@ public class SpawnManager : MonoBehaviour {
 
 	private void SpawnHitable() {
 		Hitable hitable = _pool.Get();
-		hitable.moveLeftVelocity += _speedIncrease;
 		hitable.GetComponent<Hitable>().SetKill(Kill);
 	}
 
