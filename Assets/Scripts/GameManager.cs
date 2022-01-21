@@ -83,9 +83,6 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void Play() {
-		if (!SkinsSystem.isCurrentSkinUnlocked)
-			return; // TODO: disable button
-
 		isGameRunning = true;
 		isGamePaused = false;
 		OnPlay?.Invoke();

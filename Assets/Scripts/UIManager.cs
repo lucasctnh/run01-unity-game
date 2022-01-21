@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class UIManager : MonoBehaviour {
@@ -10,6 +11,7 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _initMenu;
 	[SerializeField] private TMP_Text _initBestScoreText;
 	[SerializeField] private TMP_Text _initCoinsText;
+	[SerializeField] private Button _playButton;
 	[SerializeField] private GameObject _pauseMenu;
 	[SerializeField] private GameObject _gameOverMenu;
 	[SerializeField] private GameObject _withNewBestScoreGroup;
@@ -44,7 +46,10 @@ public class UIManager : MonoBehaviour {
 
 	private void Start() => SetMenusVisibility(true, false, false);
 
-	private void Update() => _gameUI.SetActive(GameManager.Instance.isGameRunning);
+	private void Update() {
+		_playButton.enabled = SkinsSystem.isCurrentSkinUnlocked;
+		_gameUI.SetActive(GameManager.Instance.isGameRunning);
+	}
 
 	public void ChangeSkinByLeft() => OnChangeSkin?.Invoke(false);
 
