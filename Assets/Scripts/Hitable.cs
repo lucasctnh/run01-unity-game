@@ -8,11 +8,6 @@ public abstract class Hitable : MonoBehaviour {
 
 	protected Action<Hitable> _killAction;
 
-	[Tooltip("The initial speed which all hitable objects will continuously move towards the player")]
-	[SerializeField] private float _initialMoveLeftSpeed = 15f;
-
-	private void Start() => moveLeftSpeed = _initialMoveLeftSpeed;
-
 	private void FixedUpdate() => transform.Translate(Vector3.left * moveLeftSpeed * Time.deltaTime, Space.World);
 
 	protected abstract void OnTriggerEnter(Collider other);

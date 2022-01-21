@@ -29,6 +29,9 @@ public class GameManager : MonoBehaviour {
 	[Tooltip("Amount in seconds which the score will keep increasing")]
 	[SerializeField] private float _increaseDificultyRate = 2f;
 
+	[Tooltip("The initial speed which all hitable objects will continuously move towards the player")]
+	[SerializeField] private float _initialMoveLeftSpeed = 15f;
+
 	[Tooltip("Amount of speed which the hitable object will increase over time")]
 	[SerializeField] private float _speedIncrease = .5f;
 
@@ -60,6 +63,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void Start() {
+		Hitable.moveLeftSpeed = _initialMoveLeftSpeed;
+
 		SaveData data = SaveSystem.Load();
 		if (data != null)
 			AssignSaveData(data);
@@ -68,11 +73,14 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (isGameRunning)
+		if (isGameRunning && !isGamePaused)
 			CallRepeating(IncreaseScore, ref _scoreTimer, _scoreRate);
 	}
 
-	private void LateUpdate() => CallRepeating(IncreaseDificulty, ref _difficultyTimer, _increaseDificultyRate);
+	private void LateUpdate() {
+		if (isGameRunning && !isGamePaused)
+		CallRepeating(IncreaseDificulty, ref _difficultyTimer, _increaseDificultyRate);
+	}
 
 	public void Play() {
 		if (!SkinsSystem.isCurrentSkinUnlocked)
