@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5258790899183949403}
   - component: {fileID: 8472898660486759819}
   - component: {fileID: 7290918309918536952}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Obstacle
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccee9f88051753848be50c6f43f5f6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveLeftVelocity: 20
+  _initialMoveLeftSpeed: 15
   _horizontalPosition: 19.25
   _verticalPositions:
   - 3.5

@@ -149,5 +149,5 @@ public class GameManager : MonoBehaviour {
 		OnUpdateScore?.Invoke(_score);
 	}
 
-	private void IncreaseDificulty() => Hitable.moveLeftVelocity += _speedIncrease;
+	private void IncreaseDificulty() => Hitable.moveLeftSpeed += _speedIncrease;
 }

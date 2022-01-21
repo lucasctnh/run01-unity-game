@@ -38,12 +38,14 @@ public class PlayerController : MonoBehaviour {
 	private void OnEnable() {
 		// InputsController.OnTouchInput += Jump;
 		InputsController.OnJump += Jump;
+		InputsController.OnHoldingJump += isHoldingJump => AssignHoldingJump(isHoldingJump);
 		InputsController.OnMove += VerifyMove;
 	}
 
 	private void OnDisable() {
 		// InputsController.OnTouchInput -= Jump;
 		InputsController.OnJump -= Jump;
+		InputsController.OnHoldingJump -= isHoldingJump => AssignHoldingJump(isHoldingJump);
 		InputsController.OnMove -= VerifyMove;
 	}
 
@@ -61,7 +63,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void ButtonJump() {
 		if (_jumps > 0 && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
-			GetComponent<Rigidbody>().AddForce(Vector3.up * _jumpForce * _gravityDirection, ForceMode.VelocityChange);
+			GetComponent<Rigidbody>().velocity = Vector3.up * _jumpForce * _gravityDirection;
 			_jumps--;
 		}
 	}
@@ -77,16 +79,16 @@ public class PlayerController : MonoBehaviour {
 	private void HandleGravity() {
 		Rigidbody rb = GetComponent<Rigidbody>();
 		if (_gravityDirection == 1) {
-			if (rb.velocity.y < 0)
+			if (rb.velocity.y < 0 && !_isHoldingJump)
 				ApplyCustomGravityFall(rb);
-			// else if (rb.velocity.y > 0 && !_isHoldingJump) // TODO: figure a way to implement this shit later
-			// 	ApplyCustomGravityLowJumpFall(rb);
+			else if (rb.velocity.y > 0 && !_isHoldingJump)
+				ApplyCustomGravityLowJumpFall(rb);
 		}
 		else {
-			if (rb.velocity.y > 0)
+			if (rb.velocity.y > 0 && !_isHoldingJump)
 				ApplyCustomGravityFall(rb);
-			// else if (rb.velocity.y < 0 && !_isHoldingJump)
-			// 	ApplyCustomGravityLowJumpFall(rb);
+			else if (rb.velocity.y < 0 && !_isHoldingJump)
+				ApplyCustomGravityLowJumpFall(rb);
 		}
 	}
 
@@ -117,10 +119,12 @@ public class PlayerController : MonoBehaviour {
 
 	private void Jump() {
 		if (_jumps > 0) {
-			GetComponent<Rigidbody>().AddForce(Vector3.up * _jumpForce * _gravityDirection, ForceMode.VelocityChange);
+			GetComponent<Rigidbody>().velocity = Vector3.up * _jumpForce * _gravityDirection;
 			_jumps--;
 		}
 	}
+
+	private void AssignHoldingJump(bool isHoldingJump) => _isHoldingJump = isHoldingJump;
 
 	private void VerifyMove(float yDrag) {
 		int newGravityDirection = (yDrag > 0) ? 1 : -1;

@@ -8,6 +8,7 @@ using UnityEngine.Profiling;
 public class InputsController : MonoBehaviour {
 	public static event Action OnTouchInput;
 	public static event Action OnJump;
+	public static event Action<bool> OnHoldingJump;
 	public static event Action<float> OnMove;
 
 	private float _yDrag = 0f;
@@ -33,6 +34,15 @@ public class InputsController : MonoBehaviour {
 	public void Jump(InputAction.CallbackContext context) {
 		if (context.performed && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused)
 			OnJump?.Invoke();
+
+		HoldingJump(context);
+	}
+
+	private void HoldingJump(InputAction.CallbackContext context) {
+		if (context.performed)
+			OnHoldingJump?.Invoke(true);
+		if (context.canceled)
+			OnHoldingJump?.Invoke(false);
 	}
 
 	public void Move(InputAction.CallbackContext context) {

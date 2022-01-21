@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7095685585566435486}
   - component: {fileID: 7095685585566435485}
   - component: {fileID: -4428908193939722198}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Collectable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a90fa96c9e2f124589a3d60924b62dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveLeftVelocity: 20
+  _initialMoveLeftSpeed: 15
   _min: {x: 0, y: -4}
   _max: {x: 19.25, y: 4}
 --- !u!33 &7095685585566435487

@@ -11,7 +11,8 @@
                     "id": "1c26bd8b-fe8a-42fc-b06b-dec2ebc91c7a",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "Press",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -38,7 +39,8 @@
                     "id": "6f923f35-b845-4022-ba10-2e9d29ff51d1",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Hold(duration=0.25)"
+                    "interactions": "Hold(duration=0.25)",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Drag",
@@ -46,7 +48,8 @@
                     "id": "cb08782a-0955-4644-85a6-4aef8521f2ee",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -117,7 +120,8 @@
                     "id": "dc16ecb1-6c43-4c36-b79f-fca31a7f82d4",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Move",
@@ -125,7 +129,8 @@
                     "id": "2136f2a0-cf38-4235-aa20-e583e6c1e641",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -133,7 +138,7 @@
                     "name": "",
                     "id": "260ab8a4-e9f0-4f0e-8140-fc049f4f027c",
                     "path": "<Keyboard>/space",
-                    "interactions": "",
+                    "interactions": "Press",
                     "processors": "",
                     "groups": "Keyboard",
                     "action": "Jump",

@@ -4,12 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Hitable : MonoBehaviour {
-	[Tooltip("The velocity which all hitable objects will continuously move towards the player")]
-	public static float moveLeftVelocity = 20f;
+	public static float moveLeftSpeed;
 
 	protected Action<Hitable> _killAction;
 
-	private void FixedUpdate() => transform.Translate(Vector3.left * moveLeftVelocity * Time.deltaTime, Space.World);
+	[Tooltip("The initial speed which all hitable objects will continuously move towards the player")]
+	[SerializeField] private float _initialMoveLeftSpeed = 15f;
+
+	private void Start() => moveLeftSpeed = _initialMoveLeftSpeed;
+
+	private void FixedUpdate() => transform.Translate(Vector3.left * moveLeftSpeed * Time.deltaTime, Space.World);
 
 	protected abstract void OnTriggerEnter(Collider other);
 
