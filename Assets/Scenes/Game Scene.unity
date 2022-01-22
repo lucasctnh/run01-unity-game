@@ -444,19 +444,7 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 128496709}
-        m_TargetAssemblyTypeName: InputsController, Assembly-CSharp
-        m_MethodName: TouchInput
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: 1c26bd8b-fe8a-42fc-b06b-dec2ebc91c7a
     m_ActionName: Touch/TouchInput
   - m_PersistentCalls:
@@ -479,7 +467,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 128496709}
         m_TargetAssemblyTypeName: InputsController, Assembly-CSharp
-        m_MethodName: Move
+        m_MethodName: Switch
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -13,15 +13,9 @@ public class CameraController : MonoBehaviour {
 	private Vector3 _velocity = Vector3.zero;
 	private int _currentDirection = 1;
 
-	private void OnEnable() {
-		// InputsController.OnTouchInput += Jump;
-		InputsController.OnMove += FollowPlayer;
-	}
+	private void OnEnable() => InputsController.OnSwitch += FollowPlayer;
 
-	private void OnDisable() {
-		// InputsController.OnTouchInput -= Jump;
-		InputsController.OnMove -= FollowPlayer;
-	}
+	private void OnDisable() => InputsController.OnSwitch -= FollowPlayer;
 
 	private void Start() => _targetPosition = _defaultPosition;
 

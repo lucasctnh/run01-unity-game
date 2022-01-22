@@ -6,10 +6,9 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 
 public class InputsController : MonoBehaviour {
-	public static event Action OnTouchInput;
 	public static event Action OnJump;
 	public static event Action<bool> OnHoldingJump;
-	public static event Action<float> OnMove;
+	public static event Action<float> OnSwitch;
 	public static event Action OnButtonJump;
 	public static event Action OnButtonSwitch;
 
@@ -23,24 +22,6 @@ public class InputsController : MonoBehaviour {
 	public void ButtonJumpPointerUp(BaseEventData eventData) => OnHoldingJump?.Invoke(false);
 
 	public void ButtonSwitch() => OnButtonSwitch?.Invoke();
-
-	public void TouchInput(InputAction.CallbackContext context) {
-		OnTouchInput?.Invoke();
-	}
-
-	public void Click(InputAction.CallbackContext context) {
-		if (context.performed && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused)
-			OnJump?.Invoke();
-	}
-
-	public void Drag(InputAction.CallbackContext context) {
-		if (!GameManager.Instance.isGameRunning || GameManager.Instance.isGamePaused)
-			return;
-		if (context.performed)
-			_yDrag = context.ReadValue<Vector2>().y;
-		if (context.canceled && _yDrag != 0)
-			OnMove?.Invoke(_yDrag);
-	}
 
 	public void Jump(InputAction.CallbackContext context) {
 		if (context.performed && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused)
@@ -56,11 +37,11 @@ public class InputsController : MonoBehaviour {
 			OnHoldingJump?.Invoke(false);
 	}
 
-	public void Move(InputAction.CallbackContext context) {
+	public void Switch(InputAction.CallbackContext context) {
 		if (context.performed && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
 			_yDrag = context.ReadValue<float>();
 			if (_yDrag != 0)
-				OnMove?.Invoke(_yDrag);
+				OnSwitch?.Invoke(_yDrag);
 		}
 	}
 }

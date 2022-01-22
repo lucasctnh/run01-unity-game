@@ -36,19 +36,17 @@ public class PlayerController : MonoBehaviour {
 	private bool _isHoldingJump = false;
 
 	private void OnEnable() {
-		// InputsController.OnTouchInput += Jump;
 		InputsController.OnJump += Jump;
 		InputsController.OnHoldingJump += isHoldingJump => AssignHoldingJump(isHoldingJump);
-		InputsController.OnMove += VerifyMove;
+		InputsController.OnSwitch += VerifySwitch;
 		InputsController.OnButtonJump += ButtonJump;
 		InputsController.OnButtonSwitch += ButtonSwitch;
 	}
 
 	private void OnDisable() {
-		// InputsController.OnTouchInput -= Jump;
 		InputsController.OnJump -= Jump;
 		InputsController.OnHoldingJump -= isHoldingJump => AssignHoldingJump(isHoldingJump);
-		InputsController.OnMove -= VerifyMove;
+		InputsController.OnSwitch -= VerifySwitch;
 		InputsController.OnButtonJump -= ButtonJump;
 		InputsController.OnButtonSwitch -= ButtonSwitch;
 	}
@@ -136,7 +134,7 @@ public class PlayerController : MonoBehaviour {
 
 	private void AssignHoldingJump(bool isHoldingJump) => _isHoldingJump = isHoldingJump;
 
-	private void VerifyMove(float yDrag) {
+	private void VerifySwitch(float yDrag) {
 		int newGravityDirection = (yDrag > 0) ? 1 : -1;
 		if (_gravityDirection != newGravityDirection && IsGrounded) {
 			InvertPosition();
