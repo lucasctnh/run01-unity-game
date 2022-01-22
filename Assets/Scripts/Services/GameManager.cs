@@ -65,6 +65,8 @@ public class GameManager : MonoBehaviour {
 	private void Start() {
 		Hitable.moveLeftSpeed = _initialMoveLeftSpeed;
 
+		AudioManager.Instance.PlaySound(Sound.Type.BGM, 1);
+
 		SaveData data = SaveSystem.Load();
 		if (data != null)
 			AssignSaveData(data);

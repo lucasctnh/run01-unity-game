@@ -3,15 +3,26 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Profiling;
+using UnityEngine.EventSystems;
 
 public class InputsController : MonoBehaviour {
 	public static event Action OnTouchInput;
 	public static event Action OnJump;
 	public static event Action<bool> OnHoldingJump;
 	public static event Action<float> OnMove;
+	public static event Action OnButtonJump;
+	public static event Action OnButtonSwitch;
 
 	private float _yDrag = 0f;
+
+	public void ButtonJumpPointerDown(BaseEventData eventData) {
+		OnButtonJump?.Invoke();
+		OnHoldingJump?.Invoke(true);
+	}
+
+	public void ButtonJumpPointerUp(BaseEventData eventData) => OnHoldingJump?.Invoke(false);
+
+	public void ButtonSwitch() => OnButtonSwitch?.Invoke();
 
 	public void TouchInput(InputAction.CallbackContext context) {
 		OnTouchInput?.Invoke();

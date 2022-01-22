@@ -40,6 +40,8 @@ public class PlayerController : MonoBehaviour {
 		InputsController.OnJump += Jump;
 		InputsController.OnHoldingJump += isHoldingJump => AssignHoldingJump(isHoldingJump);
 		InputsController.OnMove += VerifyMove;
+		InputsController.OnButtonJump += ButtonJump;
+		InputsController.OnButtonSwitch += ButtonSwitch;
 	}
 
 	private void OnDisable() {
@@ -47,6 +49,8 @@ public class PlayerController : MonoBehaviour {
 		InputsController.OnJump -= Jump;
 		InputsController.OnHoldingJump -= isHoldingJump => AssignHoldingJump(isHoldingJump);
 		InputsController.OnMove -= VerifyMove;
+		InputsController.OnButtonJump -= ButtonJump;
+		InputsController.OnButtonSwitch -= ButtonSwitch;
 	}
 
 	private void Start() => ResetGravity();
@@ -64,15 +68,19 @@ public class PlayerController : MonoBehaviour {
 	public void ButtonJump() {
 		if (_jumps > 0 && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
 			GetComponent<Rigidbody>().velocity = Vector3.up * _jumpForce * _gravityDirection;
+			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Jump, 2);
+
 			_jumps--;
 		}
 	}
 
-	public void ButtonMove() {
+	public void ButtonSwitch() {
 		if (IsGrounded && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
 			InvertPosition();
 			_gravityDirection *= -1;
 			_camera.InvertCamera();
+
+			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Switch, 2);
 		}
 	}
 
@@ -120,6 +128,8 @@ public class PlayerController : MonoBehaviour {
 	private void Jump() {
 		if (_jumps > 0) {
 			GetComponent<Rigidbody>().velocity = Vector3.up * _jumpForce * _gravityDirection;
+			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Jump, 2);
+
 			_jumps--;
 		}
 	}
@@ -131,6 +141,8 @@ public class PlayerController : MonoBehaviour {
 		if (_gravityDirection != newGravityDirection && IsGrounded) {
 			InvertPosition();
 			AssignNewGravityDirection(newGravityDirection);
+
+			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Switch, 2);
 		}
 	}
 
