@@ -147,7 +147,7 @@ public class PlayerController : MonoBehaviour {
 	private void AssignNewGravityDirection(int newGravityDirection) => _gravityDirection = newGravityDirection;
 
 	private void InvertPosition() {
-		transform.Rotate(new Vector3(180, 0, 0), Space.Self);
+		transform.Rotate(new Vector3(0, 0, 180), Space.Self);
 		transform.position = new Vector3(transform.position.x, transform.position.y * -1, transform.position.z);
 
 		InvertGravity();

@@ -147,9 +147,15 @@ public class GameManager : MonoBehaviour {
 			return false;
 	}
 
-	private void FreezeTime() => Time.timeScale = 0f;
+	private void FreezeTime() {
+		Time.timeScale = 0f;
+		AudioManager.Instance.StopSound(1);
+	}
 
-	private void UnfreezeTime() => Time.timeScale = 1f;
+	private void UnfreezeTime() {
+		Time.timeScale = 1f;
+		AudioManager.Instance.PlaySound(Sound.Type.BGM, 1);
+	}
 
 	private void IncreaseScore() {
 		_score++;

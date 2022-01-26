@@ -8,7 +8,7 @@ public abstract class Hitable : MonoBehaviour {
 
 	protected Action<Hitable> _killAction;
 
-	private void FixedUpdate() => transform.Translate(Vector3.left * moveLeftSpeed * Time.deltaTime, Space.World);
+	private void FixedUpdate() => transform.Translate(Vector3.left * moveLeftSpeed * Time.fixedDeltaTime, Space.World);
 
 	protected abstract void OnTriggerEnter(Collider other);
 
