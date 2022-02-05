@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour {
 	public static event Action<int> OnUpdateScore;
 	public static event Action<int> OnUpdateCoins;
 	public static event Action<int> OnUpdateFinalScore;
+	public static event Action<bool> OnMute;
 
 	public int BestScore { get { return _bestScore; } }
 	public int Coins { get { return _coins; } }
@@ -23,14 +24,17 @@ public class GameManager : MonoBehaviour {
 	public bool isGamePaused = false;
 
 
+	[Tooltip("Amount of speed which the skybox will rotate")]
+	[SerializeField] private float _skyboxSpeed = 8f;
+
 	[Tooltip("Threshold amount in seconds which the score will keep increasing")]
 	[SerializeField] private float _scoreRate = 1f;
 
 	[Tooltip("Amount in seconds which the score will keep increasing")]
 	[SerializeField] private float _increaseDificultyRate = 2f;
 
-	[Tooltip("The initial speed which all hitable objects will continuously move towards the player")]
-	[SerializeField] private float _initialMoveLeftSpeed = 15f;
+	[Tooltip("The relative player speed, i.e. the speed of the objects coming towards the player")]
+	public float playerSpeed = 15f;
 
 	[Tooltip("Amount of speed which the hitable object will increase over time")]
 	[SerializeField] private float _speedIncrease = .5f;
@@ -42,6 +46,7 @@ public class GameManager : MonoBehaviour {
 	private int _score = 0;
 	private int _bestScore = 0;
 	private int _coins = 0;
+	private bool _isMuted = false;
 
 	public static void CallRepeating(Action action, ref float timer, float repeatRate) {
 		timer -= Time.deltaTime;
@@ -63,8 +68,6 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void Start() {
-		Hitable.moveLeftSpeed = _initialMoveLeftSpeed;
-
 		AudioManager.Instance.PlaySound(Sound.Type.BGM, 1);
 
 		SaveData data = SaveSystem.Load();
@@ -75,8 +78,10 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (isGameRunning && !isGamePaused)
+		if (isGameRunning && !isGamePaused) {
 			CallRepeating(IncreaseScore, ref _scoreTimer, _scoreRate);
+			RenderSettings.skybox.SetFloat("_Rotation", Time.time * _skyboxSpeed);
+		}
 	}
 
 	private void LateUpdate() {
@@ -93,7 +98,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void Pause() {
-		isGameRunning = true;
+		isGameRunning = false;
 		isGamePaused = true;
 		OnPause?.Invoke();
 
@@ -101,6 +106,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void GameOver() {
+		if (!isGameRunning && isGamePaused) // to avoid GameOver being called twice // TODO: refactor
+			return;
+
 		isGameRunning = false;
 		isGamePaused = true;
 		OnGameOver?.Invoke(IsThereNewBestScore());
@@ -123,6 +131,16 @@ public class GameManager : MonoBehaviour {
 		OnUpdateCoins?.Invoke(_coins);
 
 		SaveSystem.Save(_bestScore, _coins);
+	}
+
+	public void Mute() {
+		_isMuted = !_isMuted;
+		OnMute?.Invoke(_isMuted);
+
+		if (_isMuted)
+			AudioManager.Instance.MuteAll();
+		else
+			AudioManager.Instance.UnmuteAll();
 	}
 
 	private void LimitFrameRate() {
@@ -162,5 +180,5 @@ public class GameManager : MonoBehaviour {
 		OnUpdateScore?.Invoke(_score);
 	}
 
-	private void IncreaseDificulty() => Hitable.moveLeftSpeed += _speedIncrease;
+	private void IncreaseDificulty() => playerSpeed += _speedIncrease;
 }
