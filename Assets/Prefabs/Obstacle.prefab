@@ -48,8 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccee9f88051753848be50c6f43f5f6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initialMoveLeftSpeed: 15
-  _horizontalPosition: 19.25
+  _horizontalPosition: 50
   _verticalPositions:
   - 3.5
   - -3.5
@@ -83,7 +82,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 45daa180bf96ce1448a07618f4c47a3f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -113,7 +112,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5703426889152646506}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}

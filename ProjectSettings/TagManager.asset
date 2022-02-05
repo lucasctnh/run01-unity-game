@@ -5,7 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Obstacle
-  - Obstacle Destroyer
+  - Collectable
+  - Hitable Destroyer
   layers:
   - Default
   - TransparentFX
@@ -16,7 +17,7 @@ TagManager:
   - Obstacle
   - Collectable
   - Ground
-  - 
+  - Background
   - 
   - 
   - 
