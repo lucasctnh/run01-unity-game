@@ -5,25 +5,28 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Obstacle : Hitable {
-	[Tooltip("The x-axis position for the obstacles spawn")]
-	[SerializeField] private float _horizontalPosition;
+	[Tooltip("The minimum angle threshold which colliding with obstacles will result in gameover")]
+	[SerializeField] private float _angleThreshold = 40f;
 
-
-	[Tooltip("A list of the possible y-axis positions for the obstacles")]
-	[SerializeField] private List<float> _verticalPositions = new List<float>();
-
-	protected override void OnTriggerEnter(Collider other) {
-		if (other.gameObject.CompareTag("Player"))
-			GameManager.Instance.GameOver();
-		if (other.gameObject.CompareTag("Obstacle Destroyer"))
+	protected override void OnCollisionEnter(Collision other) {
+		if (other.gameObject.CompareTag("Hitable Destroyer"))
 			_killAction(this);
+		if (other.gameObject.CompareTag("Player")) {
+			for (int i = 0; i < other.contacts.Length; i++) {
+				float currentAngleRefUp = Vector3.Angle(other.contacts[i].normal, Vector3.up);
+				float currentAngleRefDown = Vector3.Angle(other.contacts[i].normal, Vector3.down);
+
+				if (currentAngleRefUp <= _angleThreshold || currentAngleRefDown <= _angleThreshold) {
+					other.gameObject.GetComponent<PlayerController>().RechargeJumps();
+					break;
+				}
+				else
+					GameManager.Instance.GameOver();
+			}
+		}
 	}
 
-	private int CreateRandomNumber() {
-		return Random.Range(0, _verticalPositions.Count);
-	}
-
-	public override Vector3 CreateRandomPosition() {
-		return new Vector3(_horizontalPosition, _verticalPositions[CreateRandomNumber()], transform.position.z);
+	public override Vector3 GenerateRandomPosition(float horizontalPosition) {
+		return new Vector3(horizontalPosition, transform.position.y, transform.position.z);
 	}
 }
