@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _initMenu;
 	[SerializeField] private TMP_Text _initBestScoreText;
 	[SerializeField] private TMP_Text _initCoinsText;
+	[SerializeField] private GameObject _initMuteSign;
 	[SerializeField] private Button _playButton;
 	[SerializeField] private GameObject _pauseMenu;
 	[SerializeField] private GameObject _gameOverMenu;
@@ -21,10 +22,12 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _gameUI;
 	[SerializeField] private TMP_Text _scoreText;
 	[SerializeField] private TMP_Text _coinsText;
+	[SerializeField] private GameObject _muteSign;
 
 	private void OnEnable() {
 		GameManager.OnPlay += OnPlay;
 		GameManager.OnPause += OnPause;
+		GameManager.OnMute += muteState => OnMute(muteState);
 		GameManager.OnGameOver += isThereNewBestScore => OnGameOver(isThereNewBestScore);
 		GameManager.OnAssignSaveData += data => UpdateSavedPoints(data);
 		GameManager.OnUpdateBestScore += bestScore => UpdateBestScore(bestScore);
@@ -36,6 +39,7 @@ public class UIManager : MonoBehaviour {
 	private void OnDisable() {
 		GameManager.OnPlay -= OnPlay;
 		GameManager.OnPause -= OnPause;
+		GameManager.OnMute -= muteState => OnMute(muteState);
 		GameManager.OnGameOver -= isThereNewBestScore => OnGameOver(isThereNewBestScore);
 		GameManager.OnAssignSaveData -= data => UpdateSavedPoints(data);
 		GameManager.OnUpdateBestScore -= bestScore => UpdateBestScore(bestScore);
@@ -62,6 +66,11 @@ public class UIManager : MonoBehaviour {
 	private void OnGameOver(bool isThereNewBestScore) {
 		SetMenusVisibility(false, false, true);
 		ShowScoreGroup(isThereNewBestScore);
+	}
+
+	private void OnMute(bool muteState) {
+		_initMuteSign.SetActive(muteState);
+		_muteSign.SetActive(muteState);
 	}
 
 	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
@@ -91,8 +100,8 @@ public class UIManager : MonoBehaviour {
 	}
 
 	private void UpdateBestScore(int bestScore) {
-		 _initBestScoreText.text = "Best: " + bestScore;
-		 _bestScoreText.text = "Best: " + bestScore;
+		_initBestScoreText.text = "Best: " + bestScore;
+		_bestScoreText.text = "Best: " + bestScore;
 	}
 
 	private void UpdateScore(int score) => _scoreText.text = "Score: " + score;
