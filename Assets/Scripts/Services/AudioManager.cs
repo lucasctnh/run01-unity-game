@@ -39,6 +39,16 @@ public class AudioManager : MonoBehaviour {
 		audioSource.PlayOneShot(GetAudioClip(soundType));
 	}
 
+	public void MuteAll() {
+		foreach (AudioSource track in _tracks)
+			track.mute = true;
+	}
+
+	public void UnmuteAll() {
+		foreach (AudioSource track in _tracks)
+			track.mute = false;
+	}
+
 	private AudioSource GetTrack(int trackNumber) {
 		return _tracks[trackNumber - 1];
 	}
