@@ -7,8 +7,12 @@ public class AudioManager : MonoBehaviour {
 
 	[SerializeField] private List<Sound> _sounds = new List<Sound>();
 
-	[Tooltip("The tracks available to play sounds. By default, the first is for music, second and third SFX, fourth ambience.")]
+	[Tooltip("The tracks available to play sounds. By default, the 1st is for BGM and the 2nd is for SFX.")]
 	[SerializeField] private List<AudioSource> _tracks = new List<AudioSource>();
+
+	private void OnEnable() => GameManager.OnUpdateVolume += (track, volume) => ChangeTrackVolume(track, volume);
+
+	private void OnDisable() => GameManager.OnUpdateVolume -= (track, volume) => ChangeTrackVolume(track, volume);
 
 	private void Awake() {
 		if (Instance != null) {
@@ -30,23 +34,18 @@ public class AudioManager : MonoBehaviour {
 
 	public void StopSound(int trackNumber) {
 		AudioSource audioSource = GetTrack(trackNumber);
-		if (audioSource.isPlaying)
+		if (audioSource != null && audioSource.isPlaying)
 			audioSource.Stop();
 	}
 
 	public void PlaySoundOneShot(Sound.Type soundType, int trackNumber) {
 		AudioSource audioSource = GetTrack(trackNumber);
-		audioSource.PlayOneShot(GetAudioClip(soundType));
+		if (audioSource != null)
+			audioSource.PlayOneShot(GetAudioClip(soundType));
 	}
 
-	public void MuteAll() {
-		foreach (AudioSource track in _tracks)
-			track.mute = true;
-	}
-
-	public void UnmuteAll() {
-		foreach (AudioSource track in _tracks)
-			track.mute = false;
+	public float GetTrackVolume(int trackNumber) {
+		return GetTrack(trackNumber).volume;
 	}
 
 	private AudioSource GetTrack(int trackNumber) {
@@ -61,5 +60,11 @@ public class AudioManager : MonoBehaviour {
 
 		Debug.LogError("Sound " + soundType + " not found.");
 		return null;
+	}
+
+	private void ChangeTrackVolume(int trackNumber, float volume) {
+		AudioSource audioSource = GetTrack(trackNumber);
+		if (audioSource != null)
+			audioSource.volume = volume;
 	}
 }

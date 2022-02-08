@@ -11,7 +11,6 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _initMenu;
 	[SerializeField] private TMP_Text _initBestScoreText;
 	[SerializeField] private TMP_Text _initCoinsText;
-	[SerializeField] private GameObject _initMuteSign;
 	[SerializeField] private Button _playButton;
 	[SerializeField] private GameObject _pauseMenu;
 	[SerializeField] private GameObject _gameOverMenu;
@@ -22,37 +21,42 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _gameUI;
 	[SerializeField] private TMP_Text _scoreText;
 	[SerializeField] private TMP_Text _coinsText;
-	[SerializeField] private GameObject _muteSign;
+	[SerializeField] private Slider _BGMSlider;
+	[SerializeField] private Slider _SFXSlider;
+	[SerializeField] private GameObject _lowGraphicsSign;
 
 	private void OnEnable() {
 		GameManager.OnPlay += OnPlay;
 		GameManager.OnPause += OnPause;
-		GameManager.OnMute += muteState => OnMute(muteState);
+		GameManager.OnResume += OnResume;
 		GameManager.OnGameOver += isThereNewBestScore => OnGameOver(isThereNewBestScore);
 		GameManager.OnAssignSaveData += data => UpdateSavedPoints(data);
 		GameManager.OnUpdateBestScore += bestScore => UpdateBestScore(bestScore);
 		GameManager.OnUpdateScore += score => UpdateScore(score);
 		GameManager.OnUpdateCoins += coins => UpdateCoins(coins);
 		GameManager.OnUpdateFinalScore += finalScore => UpdateFinalScore(finalScore);
+		GameManager.OnUpdateVolume += (track, volume) => UpdateVolumeSlider(track, volume);
 	}
 
 	private void OnDisable() {
 		GameManager.OnPlay -= OnPlay;
 		GameManager.OnPause -= OnPause;
-		GameManager.OnMute -= muteState => OnMute(muteState);
+		GameManager.OnResume -= OnResume;
 		GameManager.OnGameOver -= isThereNewBestScore => OnGameOver(isThereNewBestScore);
 		GameManager.OnAssignSaveData -= data => UpdateSavedPoints(data);
 		GameManager.OnUpdateBestScore -= bestScore => UpdateBestScore(bestScore);
 		GameManager.OnUpdateScore -= score => UpdateScore(score);
 		GameManager.OnUpdateCoins -= coins => UpdateCoins(coins);
 		GameManager.OnUpdateFinalScore -= finalScore => UpdateFinalScore(finalScore);
+		GameManager.OnUpdateVolume -= (track, volume) => UpdateVolumeSlider(track, volume);
 	}
 
 	private void Start() => SetMenusVisibility(true, false, false);
 
 	private void Update() {
 		_playButton.enabled = SkinsSystem.isCurrentSkinUnlocked;
-		_gameUI.SetActive(GameManager.Instance.isGameRunning);
+		_gameUI.SetActive(GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused);
+		_lowGraphicsSign.SetActive(GameManager.Instance.isCurrentlyLowGraphics);
 	}
 
 	public void ChangeSkinByLeft() => OnChangeSkin?.Invoke(false);
@@ -63,23 +67,27 @@ public class UIManager : MonoBehaviour {
 
 	private void OnPause() => SetMenusVisibility(false, true, false);
 
+	private void OnResume() {
+		SetMenusVisibility(false, false, false);
+
+		if (!GameManager.Instance.isGameRunning)
+			SetMenuVisibility(_initMenu, true);
+	}
+
 	private void OnGameOver(bool isThereNewBestScore) {
 		SetMenusVisibility(false, false, true);
 		ShowScoreGroup(isThereNewBestScore);
 	}
 
-	private void OnMute(bool muteState) {
-		_initMuteSign.SetActive(muteState);
-		_muteSign.SetActive(muteState);
+	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
+		SetMenuVisibility(_initMenu, mainVisibility);
+		SetMenuVisibility(_pauseMenu, pauseVisibility);
+		SetMenuVisibility(_gameOverMenu, gameOverVisibility);
 	}
 
-	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
-		if (_initMenu != null)
-			_initMenu.SetActive(mainVisibility);
-		if (_pauseMenu != null)
-			_pauseMenu.SetActive(pauseVisibility);
-		if (_gameOverMenu != null)
-			_gameOverMenu.SetActive(gameOverVisibility);
+	private void SetMenuVisibility(GameObject menu, bool visibility) {
+		if (menu != null)
+			menu.SetActive(visibility);
 	}
 
 	private void ShowScoreGroup(bool isThereNewBestScore) {
@@ -107,4 +115,11 @@ public class UIManager : MonoBehaviour {
 	private void UpdateScore(int score) => _scoreText.text = "Score: " + score;
 
 	private void UpdateFinalScore(int finalScore) => _finalScoreText.text = "You did: " + finalScore;
+
+	private void UpdateVolumeSlider(int track, float volume) {
+		if (track == 1)
+			_BGMSlider.value = volume;
+		else
+			_SFXSlider.value = volume;
+	}
 }
