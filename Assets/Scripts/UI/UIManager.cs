@@ -21,8 +21,8 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _gameUI;
 	[SerializeField] private TMP_Text _scoreText;
 	[SerializeField] private TMP_Text _coinsText;
-	[SerializeField] private Slider _BGMSlider;
-	[SerializeField] private Slider _SFXSlider;
+	[SerializeField] private Slider _bgmSlider;
+	[SerializeField] private Slider _sfxSlider;
 	[SerializeField] private GameObject _lowGraphicsSign;
 
 	private void OnEnable() {
@@ -72,6 +72,9 @@ public class UIManager : MonoBehaviour {
 
 		if (!GameManager.Instance.isGameRunning)
 			SetMenuVisibility(_initMenu, true);
+
+		SaveSystem.SaveSettings(AudioManager.Instance.GetTrackVolume(1), AudioManager.Instance.GetTrackVolume(2),
+			GameManager.Instance.isCurrentlyLowGraphics);
 	}
 
 	private void OnGameOver(bool isThereNewBestScore) {
@@ -118,8 +121,8 @@ public class UIManager : MonoBehaviour {
 
 	private void UpdateVolumeSlider(int track, float volume) {
 		if (track == 1)
-			_BGMSlider.value = volume;
+			_bgmSlider.value = volume;
 		else
-			_SFXSlider.value = volume;
+			_sfxSlider.value = volume;
 	}
 }

@@ -6,6 +6,7 @@ using UnityEngine;
 
 public static class SaveSystem { // TODO: refactor
 	private static string _path = Application.persistentDataPath + "/save.lrn";
+	private static string _settingsPath = Application.persistentDataPath + "/stt-save.lrn";
 	private static string _skinPath = Application.persistentDataPath + "/sk-save.lrn";
 
 	public static void Save(int score, int coins) {
@@ -13,6 +14,16 @@ public static class SaveSystem { // TODO: refactor
 		FileStream stream = new FileStream(_path, FileMode.Create);
 
 		SaveData data = new SaveData(score, coins);
+
+		formatter.Serialize(stream, data);
+		stream.Close();
+	}
+
+	public static void SaveSettings(float bgmVolume, float sfxVolume, bool isLowGraphics) {
+		BinaryFormatter formatter = new BinaryFormatter();
+		FileStream stream = new FileStream(_settingsPath, FileMode.Create);
+
+		SettingsSaveData data = new SettingsSaveData(bgmVolume, sfxVolume, isLowGraphics);
 
 		formatter.Serialize(stream, data);
 		stream.Close();
@@ -39,6 +50,21 @@ public static class SaveSystem { // TODO: refactor
 			return data;
 		} else {
 			Debug.LogError("Save file not found in " + _path);
+			return null;
+		}
+	}
+
+	public static SettingsSaveData LoadSettings() {
+		if (File.Exists(_settingsPath)) {
+			BinaryFormatter formatter = new BinaryFormatter();
+			FileStream stream = new FileStream(_settingsPath, FileMode.Open);
+
+			SettingsSaveData data = formatter.Deserialize(stream) as SettingsSaveData;
+			stream.Close();
+
+			return data;
+		} else {
+			Debug.LogError("Save file not found in " + _settingsPath);
 			return null;
 		}
 	}

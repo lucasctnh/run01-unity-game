@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.40483403, g: 0.22859895, b: 0.097418904, a: 1}
+  m_IndirectSpecularColor: {r: 0.40490907, g: 0.22884567, b: 0.09757073, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -16498,8 +16498,8 @@ MonoBehaviour:
   _gameUI: {fileID: 553483055}
   _scoreText: {fileID: 283715900}
   _coinsText: {fileID: 834841147}
-  _BGMSlider: {fileID: 2098335737}
-  _SFXSlider: {fileID: 1820219323}
+  _bgmSlider: {fileID: 2098335737}
+  _sfxSlider: {fileID: 1820219323}
   _lowGraphicsSign: {fileID: 1840877703}
 --- !u!1001 &2077963306
 PrefabInstance:

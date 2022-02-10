@@ -74,13 +74,17 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void Start() {
-		InitializeAudio();
-
-		isCurrentlyLowGraphics = QualitySettings.GetQualityLevel() == 0;
+		AudioManager.Instance.PlaySound(Sound.Type.BGM, 1);
 
 		SaveData data = SaveSystem.Load();
 		if (data != null)
 			AssignSaveData(data);
+
+		SettingsSaveData settingsData = SaveSystem.LoadSettings();
+		if (settingsData != null)
+			AssignSettings(settingsData);
+		else
+			InitializeTrackVolumes();
 
 		UnfreezeTime();
 	}
@@ -157,12 +161,15 @@ public class GameManager : MonoBehaviour {
 	public void ChangeSFXVolume(float value) => OnUpdateVolume?.Invoke(2, value);
 
 	public void ChangeQuality() {
-		if (isCurrentlyLowGraphics)
-			ChangeQualityToHigh();
-		else
-			ChangeQualityToLow();
-
 		isCurrentlyLowGraphics = !isCurrentlyLowGraphics;
+		AssignQuality();
+	}
+
+	private void AssignQuality() {
+		if (isCurrentlyLowGraphics)
+			ChangeQualityToLow();
+		else
+			ChangeQualityToHigh();
 	}
 
 	private void ChangeQualityToLow() {
@@ -180,10 +187,9 @@ public class GameManager : MonoBehaviour {
 		Application.targetFrameRate = _targetFrameRate;
 	}
 
-	private void InitializeAudio() {
+	private void InitializeTrackVolumes() {
 		InitializeTrackVolume(1);
 		InitializeTrackVolume(2);
-		AudioManager.Instance.PlaySound(Sound.Type.BGM, 1);
 	}
 
 	private void InitializeTrackVolume(int track) => OnUpdateVolume?.Invoke(track, AudioManager.Instance.GetTrackVolume(track));
@@ -193,6 +199,14 @@ public class GameManager : MonoBehaviour {
 		_coins = data.coins;
 
 		OnAssignSaveData?.Invoke(data);
+	}
+
+	private void AssignSettings(SettingsSaveData data) {
+		isCurrentlyLowGraphics = data.isLowGraphics;
+		AssignQuality();
+
+		OnUpdateVolume?.Invoke(1, data.bgmVolume);
+		OnUpdateVolume?.Invoke(2, data.sfxVolume);
 	}
 
 	private bool IsThereNewBestScore() {
