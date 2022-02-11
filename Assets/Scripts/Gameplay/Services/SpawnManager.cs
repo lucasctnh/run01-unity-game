@@ -17,6 +17,7 @@ public class SpawnManager : MonoBehaviour {
 
 	private List<ObjectPool<Hitable>> _pools = new List<ObjectPool<Hitable>>();
 	private float _timer = 0f;
+	private bool _isSelectingPool = true;
 
 	private void Start() {
 		foreach (Hitable hitablePrefab in _hitablePrefabs)
@@ -47,9 +48,27 @@ public class SpawnManager : MonoBehaviour {
 	}
 
 	private void SpawnHitable() {
-		ObjectPool<Hitable> pool = GetRandomPool();
-		Hitable hitable = pool.Get();
-		hitable.GetComponent<Hitable>().SetKill(hitable => Kill(pool, hitable));
+		while (_isSelectingPool) {
+			ObjectPool<Hitable> pool = GetRandomPool();
+			Hitable hitable = pool.Get();
+			hitable.GetComponent<Hitable>().SetKill(hitable => Kill(pool, hitable));
+
+			if (!CheckShouldSpawn(hitable))
+				pool.Release(hitable);
+		}
+
+		_isSelectingPool = true;
+	}
+
+	private bool CheckShouldSpawn(Hitable hitable) {
+		if (hitable.spawnRate <= 0)
+			return false;
+		else if (Random.Range(0f, 1f) <= hitable.spawnRate) {
+			_isSelectingPool = false;
+			return true;
+		}
+		else
+			return false;
 	}
 
 	private ObjectPool<Hitable> GetRandomPool() {

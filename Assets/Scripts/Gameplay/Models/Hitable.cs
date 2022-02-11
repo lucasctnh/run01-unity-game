@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Hitable : MonoBehaviour {
+	[Tooltip("The percentage chance of actually spawning that hitable")]
+	[Range(0f, 1f)]
+	public float spawnRate = 1f;
+
 	[Tooltip("This custom speed will be added to the base speed")]
 	[SerializeField] private float _customSpeedMultiplier = 0f;
 
