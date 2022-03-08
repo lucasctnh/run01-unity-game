@@ -10,10 +10,10 @@ public class SpawnManager : MonoBehaviour {
 	[SerializeField] private Hitable[] _hitablePrefabs;
 
 	[Tooltip("A delay time in seconds to wait before start spawning collectables")]
-	[SerializeField] private float _startDelay = 2;
+	[SerializeField] private float _startDelay = 4;
 
 	[Tooltip("The time in seconds in which the spawn will keep repeating")]
-	[SerializeField] private float _repeatRate = 2;
+	public float repeatRate = 3;
 
 	private List<ObjectPool<Hitable>> _pools = new List<ObjectPool<Hitable>>();
 	private float _timer = 0f;
@@ -29,7 +29,7 @@ public class SpawnManager : MonoBehaviour {
 
 	private void Update() {
 		if (GameManager.Instance.isGameRunning)
-			GameManager.CallRepeating(SpawnHitable, ref _timer, _repeatRate);
+			GameManager.CallRepeating(SpawnHitable, ref _timer, repeatRate);
 	}
 
 	private Hitable CreateHitable(Hitable hitablePrefab) {
@@ -40,10 +40,14 @@ public class SpawnManager : MonoBehaviour {
 		return hitable.GenerateRandomPosition(transform.position.x);
 	}
 
-	private void OnGetHitableFromPool(Hitable hitable) => hitable.gameObject.SetActive(true);
+	private void OnGetHitableFromPool(Hitable hitable) {
+		hitable.isReleased = false;
+		hitable.gameObject.SetActive(true);
+	}
 
 	private void OnReleaseHitableToPool(Hitable hitable) {
-		hitable.transform.position = GenerateRandomPosition(hitable);
+		hitable.isReleased = true;
+		hitable.transform.position = GenerateRandomPosition(hitable); // TODO: check if this is causing physics spike
 		hitable.gameObject.SetActive(false);
 	}
 
@@ -61,9 +65,9 @@ public class SpawnManager : MonoBehaviour {
 	}
 
 	private bool CheckShouldSpawn(Hitable hitable) {
-		if (hitable.spawnRate <= 0)
+		if (hitable.SpawnRate <= 0f)
 			return false;
-		else if (Random.Range(0f, 1f) <= hitable.spawnRate) {
+		else if (Random.Range(0f, 1f) <= hitable.SpawnRate) {
 			_isSelectingPool = false;
 			return true;
 		}

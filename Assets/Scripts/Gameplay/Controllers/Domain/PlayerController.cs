@@ -6,7 +6,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
-	public static event Action AfterSwitch;
+	public static event Action OnInvertedPosition;
+	public static event Action OnReachedSwapPoint;
 	public static bool IsGrounded { get; private set; }
 
 	[Header("Ground Settings")]
@@ -30,9 +31,17 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	[Tooltip("The speed multiplier for dissolving shader to complete")]
 	[SerializeField] private float _teleportSpeed = 15f;
 
+	[Tooltip("The horizontal force multiplier for throwing player at game over")]
+	[SerializeField] private float _ragdollHorizontalMultiplier = 1f;
+
+	[Tooltip("The vertical force multiplier for throwing player at game over")]
+	[SerializeField] private float _ragdollVerticalMultiplier = 2f;
+
 	[Header("Components Reference")]
 	[Space]
 	[SerializeField] private CameraController _camera;
+	[SerializeField] private Transform _swapBridgePoint;
+	[SerializeField] private Rigidbody _rigidbody;
 	[SerializeField] private Renderer _body;
 	[SerializeField] private Renderer _eyeL;
 	[SerializeField] private Renderer _eyeR;
@@ -55,6 +64,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		InputsController.OnButtonJump += ButtonJump;
 		InputsController.OnButtonSwitch += ButtonSwitch;
 		GameManager.OnPlay += OnPlay;
+		GameManager.OnGameOver += obj => RagdollPlayer();
 	}
 
 	private void OnDisable() {
@@ -64,6 +74,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		InputsController.OnButtonJump -= ButtonJump;
 		InputsController.OnButtonSwitch -= ButtonSwitch;
 		GameManager.OnPlay -= OnPlay;
+		GameManager.OnGameOver -= obj => RagdollPlayer();
 	}
 
 	private void Awake() {
@@ -73,10 +84,10 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		_materials.Add(_eyeR.material);
 	}
 
-	private void Start() => ResetGravity();
+	private void Start() => ResetPlayer();
 
 	private void FixedUpdate() {
-		if (!GameManager.Instance.isGameRunning || GameManager.Instance.isGamePaused)
+		if (!GameManager.Instance.IsGamePlayable)
 			return;
 
 		HandleGravity();
@@ -87,14 +98,24 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 
 	private void Update() {
 		if (_canDissolveDown)
-			DissolveDown();
+			StartCoroutine(DissolveDown());
 		if (_canDissolveUp)
-			DissolveUp();
+			StartCoroutine(DissolveUp());
+
+		if (HaveReachedSwapPoint())
+			OnReachedSwapPoint?.Invoke();
+	}
+
+	private void OnTriggerEnter(Collider other) {
+		if (other.gameObject.CompareTag("Finish"))
+			GameManager.Instance.GameOver();
+		if (other.gameObject.CompareTag("Water"))
+			print("blup");
 	}
 
 	public void ButtonJump() {
-		if (_jumps > 0 && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
-			GetComponent<Rigidbody>().velocity = Vector3.up * _jumpForce * _gravityDirection;
+		if (_jumps > 0 && GameManager.Instance.IsGamePlayable) {
+			_rigidbody.velocity = Vector3.up * _jumpForce * _gravityDirection;
 			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Jump, 2);
 			GetComponent<Animator>().SetBool("Jump", true);
 
@@ -103,7 +124,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	}
 
 	public void ButtonSwitch() {
-		if (IsGrounded && _canTeleport && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
+		if (IsGrounded && _canTeleport && GameManager.Instance.IsGamePlayable) {
 			StartDissolving();
 			_gravityDirection *= -1;
 		}
@@ -114,7 +135,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		_jumps = 1;
 	}
 
-	private async void DissolveDown() {
+	private IEnumerator DissolveDown() {
 		_canTeleport = false;
 		_canDissolveDown = false;
 
@@ -122,10 +143,10 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		while (height >= -1) {
 			height -= Time.deltaTime * _teleportSpeed;
 			SetCutoffHeights(height);
-			await Task.Yield();
+			yield return null;
 		}
 
-		await Task.Yield();
+		yield return null;
 
 		_canDissolveUp = true;
 		InvertPosition();
@@ -136,17 +157,17 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 			material.SetFloat("_CutoffHeight", height);
 	}
 
-	private async void DissolveUp() {
+	private IEnumerator DissolveUp() {
 		_canDissolveUp = false;
 
 		float height = -1f;
 		while (height <= 3.4f) {
 			height += Time.deltaTime * _teleportSpeed;
 			SetCutoffHeights(height);
-			await Task.Yield();
+			yield return null;
 		}
 
-		await Task.Yield();
+		yield return null;
 
 		_canTeleport = true;
 	}
@@ -154,27 +175,26 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	private void OnPlay() => GetComponent<Animator>().SetTrigger("Run");
 
 	private void HandleGravity() {
-		Rigidbody rb = GetComponent<Rigidbody>();
 		if (_gravityDirection == 1) {
-			if (rb.velocity.y < 0 && !_isHoldingJump)
-				ApplyCustomGravityFall(rb);
-			else if (rb.velocity.y > 0 && !_isHoldingJump)
-				ApplyCustomGravityLowJumpFall(rb);
+			if (_rigidbody.velocity.y < 0 && !_isHoldingJump)
+				ApplyCustomGravityFall(_rigidbody);
+			else if (_rigidbody.velocity.y > 0 && !_isHoldingJump)
+				ApplyCustomGravityLowJumpFall(_rigidbody);
 		}
 		else {
-			if (rb.velocity.y > 0 && !_isHoldingJump)
-				ApplyCustomGravityFall(rb);
-			else if (rb.velocity.y < 0 && !_isHoldingJump)
-				ApplyCustomGravityLowJumpFall(rb);
+			if (_rigidbody.velocity.y > 0 && !_isHoldingJump)
+				ApplyCustomGravityFall(_rigidbody);
+			else if (_rigidbody.velocity.y < 0 && !_isHoldingJump)
+				ApplyCustomGravityLowJumpFall(_rigidbody);
 		}
 	}
 
-	private void ApplyCustomGravityFall(Rigidbody rb) {
-		rb.velocity += Vector3.up * Physics.gravity.y * (_fallMultiplier - 1) * Time.deltaTime;
+	private void ApplyCustomGravityFall(Rigidbody rigidbody) {
+		rigidbody.velocity += Vector3.up * Physics.gravity.y * (_fallMultiplier - 1) * Time.deltaTime;
 	}
 
-	private void ApplyCustomGravityLowJumpFall(Rigidbody rb) {
-		rb.velocity += Vector3.up * Physics.gravity.y * (_lowJumpMultiplier - 1) * Time.deltaTime;
+	private void ApplyCustomGravityLowJumpFall(Rigidbody rigidbody) {
+		rigidbody.velocity += Vector3.up * Physics.gravity.y * (_lowJumpMultiplier - 1) * Time.deltaTime;
 	}
 
 	private void OnLanding() {
@@ -193,7 +213,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 
 	private void Jump() {
 		if (_jumps > 0) {
-			GetComponent<Rigidbody>().velocity = Vector3.up * _jumpForce * _gravityDirection;
+			_rigidbody.velocity = Vector3.up * _jumpForce * _gravityDirection;
 			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Jump, 2);
 			GetComponent<Animator>().SetBool("Jump", true);
 
@@ -216,7 +236,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	private void StartDissolving() => _canDissolveDown = true;
 
 	private void InvertPosition() {
-		AfterSwitch?.Invoke();
+		OnInvertedPosition?.Invoke();
 		AudioManager.Instance.PlaySoundOneShot(Sound.Type.Switch, 2);
 
 		transform.Rotate(new Vector3(0, 0, 180), Space.Self);
@@ -231,5 +251,32 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	private void ResetGravity() {
 		if (Physics.gravity.y > 0)
 			InvertGravity();
+	}
+
+	private bool HaveReachedSwapPoint() {
+		if (_swapBridgePoint.position.x <= transform.position.x)
+			return true;
+
+		return false;
+	}
+
+	private void ResetPlayer() {
+		ResetRagdoll();
+		ResetGravity();
+	}
+
+	private void ResetRagdoll() {
+		if (_rigidbody != null)
+			_rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
+	}
+
+	private void RagdollPlayer() {
+		if (_rigidbody != null) {
+			_rigidbody.constraints = RigidbodyConstraints.None;
+			_rigidbody.AddForce((Vector3.left * GameManager.Instance.playerSpeed * _ragdollHorizontalMultiplier) + (transform.up * _ragdollVerticalMultiplier),
+				ForceMode.VelocityChange);
+
+			ResetGravity();
+		}
 	}
 }

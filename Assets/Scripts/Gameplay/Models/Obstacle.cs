@@ -9,7 +9,7 @@ public class Obstacle : Hitable {
 	[SerializeField] private float _angleThreshold = 40f;
 
 	protected override void OnCollisionEnter(Collision other) {
-		if (other.gameObject.CompareTag("Hitable Destroyer"))
+		if ((other.gameObject.CompareTag("Hitable Destroyer") || other.gameObject.CompareTag("Collapse Destroyer")) && !isReleased)
 			_killAction(this);
 		if (other.gameObject.CompareTag("Player")) {
 			for (int i = 0; i < other.contacts.Length; i++) {

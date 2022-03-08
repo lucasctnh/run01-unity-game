@@ -1,9 +1,19 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
+	public enum Stages {
+		GameNotStarted,
+		DynamicCars,
+		CarCrashAndCrystals,
+		BridgeCollapse,
+		EveryStage
+	}
+
 	public static GameManager Instance;
 	public static event Action OnPlay;
 	public static event Action OnPause;
@@ -16,8 +26,10 @@ public class GameManager : MonoBehaviour {
 	public static event Action<int> OnUpdateCoins;
 	public static event Action<int> OnUpdateFinalScore;
 
+	public Stages CurrentStage { get { return _stage; } }
 	public int BestScore { get { return _bestScore; } }
 	public int Coins { get { return _coins; } }
+	public bool IsGamePlayable { get { return (isGameRunning && !isGamePaused); } }
 
 	public bool isGameRunning = false;
 	public bool isGamePaused = false;
@@ -29,25 +41,57 @@ public class GameManager : MonoBehaviour {
 	public float playerSpeed = 12.5f;
 
 	[Tooltip("Amount of speed which the relative player speed will increase over time")]
-	[SerializeField] private float _speedIncrease = .5f;
+	[SerializeField] private float _speedIncrease = .1f;
 
-	[Tooltip("Threshold rate in seconds which the score will keep increasing")]
+	[Tooltip("Threshold amount in seconds which the game will repeat the increase of score")]
 	[SerializeField] private float _scoreRate = 1f;
 
-	[Tooltip("Amount of speed which the hitable object will increase over time")]
-	[SerializeField] private float _increaseDificultyRate = 2f;
+	[Tooltip("Threshold amount in seconds which the game will repeat the increase of difficulty")]
+	[SerializeField] private float _dificultyRate = 2f;
+
+	[Tooltip("Amount in seconds which the hitable object will increase it's spawn rate over time")]
+	[SerializeField] private float _spawnRateIncrease = .005f;
+
+	[Header("Stages Settings")]
+	[Space]
+	[Tooltip("The threshold amount of Score to change from stage 1 to stage 2")]
+	[SerializeField] private int _stage1Threshold = 60;
+
+	[Tooltip("The threshold amount of Score to change from stage 2 to stage 3")]
+	[SerializeField] private int _stage2Threshold = 120;
 
 	[Header("Overall Settings")]
 	[Space]
 	[Tooltip("Amount of speed which the skybox will rotate")]
 	[SerializeField] private float _skyboxSpeed = .8f;
 
+	[Tooltip("Duration in seconds to blend from one skybox to another")]
+	[SerializeField] private float _skyboxBlendDuration = 2f;
+
+	[Tooltip("Duration in seconds for the end transition to finish")]
+	[SerializeField] private float _endTransitionDuration = 1f;
+
 	[Tooltip("The targeted fps limit")]
 	[SerializeField] private int _targetFrameRate = 60;
 
+	[Header("Components References")]
+	[Space]
 	[SerializeField] private RenderPipelineAsset _lowGraphicsPipeline;
 	[SerializeField] private RenderPipelineAsset _highGraphicsPipeline;
+	[SerializeField] private SpawnManager _obstacleSpawnManager;
+	[SerializeField] private GameObject _waters;
+	[SerializeField] private List<Color> _skyboxColors = new List<Color>();
+	[SerializeField] private GameObject _bridgeCommon;
+	[SerializeField] private GameObject _bridgeDamaged;
+	[SerializeField] private Animator _endTransition;
 
+	private Stages _stage = Stages.GameNotStarted;
+	private Stages _lastStage = Stages.GameNotStarted;
+	private bool _canUpdateSkybox = false;
+	private bool _canUpdateReflectionProbes = false;
+	private bool _hasSwapedBridges = false;
+	private bool _canSwapBridges = false;
+	private float _skyboxLerpFactor = 0f;
 	private float _difficultyTimer = 0f;
 	private float _scoreTimer = 0f;
 	private int _score = 0;
@@ -62,6 +106,10 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	private void OnEnable() => PlayerController.OnReachedSwapPoint += SwapBridge;
+
+	private void OnDisable() => PlayerController.OnReachedSwapPoint -= SwapBridge;
+
 	private void Awake() {
 		if (Instance != null) {
 			Destroy(gameObject);
@@ -74,6 +122,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void Start() {
+		InitializeReset();
+
 		AudioManager.Instance.PlaySound(Sound.Type.BGM, 1);
 
 		SaveData data = SaveSystem.Load();
@@ -90,15 +140,22 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (isGameRunning && !isGamePaused) {
-			CallRepeating(IncreaseScore, ref _scoreTimer, _scoreRate);
-			RenderSettings.skybox.SetFloat("_Rotation", Time.time * _skyboxSpeed);
+		if (isGameRunning) {
+			if (!isGamePaused) {
+				CallRepeating(IncreaseScore, ref _scoreTimer, _scoreRate);
+				RenderSettings.skybox.SetFloat("_Rotation", Time.time * _skyboxSpeed);
+
+				if (_canUpdateSkybox)
+					UpdateSkybox();
+			}
+
+			HandleStages();
 		}
 	}
 
 	private void LateUpdate() {
-		if (isGameRunning && !isGamePaused)
-			CallRepeating(IncreaseDificulty, ref _difficultyTimer, _increaseDificultyRate);
+		if (IsGamePlayable)
+			CallRepeating(IncreaseDificulty, ref _difficultyTimer, _dificultyRate);
 	}
 
 	public void Play() {
@@ -127,7 +184,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void GameOver() {
-		if (!isGameRunning && isGamePaused) // to avoid GameOver being called twice // TODO: refactor
+		if (!IsGamePlayable) // to avoid GameOver being called twice // TODO: refactor
 			return;
 
 		isGameRunning = false;
@@ -139,10 +196,10 @@ public class GameManager : MonoBehaviour {
 		SaveSystem.Save(_bestScore, _coins);
 
 		AudioManager.Instance.StopSound(1);
-		FreezeTime();
+		//FreezeTime();
 	}
 
-	public void PlayAgain() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	public void PlayAgain() => StartCoroutine(ReloadSceneAfterTransition());
 
 	public void IncreaseCoin() {
 		_coins++;
@@ -187,6 +244,13 @@ public class GameManager : MonoBehaviour {
 		Application.targetFrameRate = _targetFrameRate;
 	}
 
+	private IEnumerator ReloadSceneAfterTransition() {
+		_endTransition.SetTrigger("Fade");
+		yield return new WaitForSeconds(_endTransitionDuration);
+
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	}
+
 	private void InitializeTrackVolumes() {
 		InitializeTrackVolume(1);
 		InitializeTrackVolume(2);
@@ -229,5 +293,85 @@ public class GameManager : MonoBehaviour {
 		OnUpdateScore?.Invoke(_score);
 	}
 
-	private void IncreaseDificulty() => playerSpeed += _speedIncrease;
+	private void IncreaseDificulty() {
+		playerSpeed += _speedIncrease;
+		if (_obstacleSpawnManager.repeatRate > 1f)
+			_obstacleSpawnManager.repeatRate -= _spawnRateIncrease;
+	}
+
+	private void HandleStages() {
+		if (_score > _stage2Threshold && _stage != Stages.BridgeCollapse) {
+			_canSwapBridges = true;
+			ChangeState(Stages.BridgeCollapse);
+		}
+		if ((_score > _stage1Threshold && _score <= _stage2Threshold) && _stage != Stages.CarCrashAndCrystals)
+			ChangeState(Stages.CarCrashAndCrystals);
+		if ((_score > 0 && _score <= _stage1Threshold) && _stage != Stages.DynamicCars)
+			ChangeState(Stages.DynamicCars);
+	}
+
+	private void ChangeState(Stages newStage) {
+		_lastStage = _stage;
+		_stage = newStage;
+
+		Hitable.currentStage = _stage;
+		_obstacleSpawnManager.repeatRate = 3f;
+
+		_canUpdateSkybox = true;
+	}
+
+	private void ResetSkybox() {
+		RenderSettings.skybox.SetColor("_Tint", _skyboxColors[0]);
+		UpdateReflectionProbes();
+		DynamicGI.UpdateEnvironment();
+	}
+
+	private void UpdateSkybox() {
+		int lastStage = (int)_lastStage - 1 <= 0 ? 0 : (int)_lastStage - 1;
+		if (_skyboxLerpFactor < _skyboxBlendDuration) {
+			_skyboxLerpFactor += Time.deltaTime;
+			RenderSettings.skybox.SetColor("_Tint", Color.Lerp(_skyboxColors[lastStage], _skyboxColors[(int)_stage - 1], _skyboxLerpFactor));
+
+			if (_skyboxLerpFactor < _skyboxBlendDuration / 6 || _skyboxLerpFactor < _skyboxBlendDuration / 4 || _skyboxLerpFactor < _skyboxBlendDuration / 2)
+				_canUpdateReflectionProbes = true;
+
+			if (_canUpdateReflectionProbes) {
+				UpdateReflectionProbes();
+				_canUpdateReflectionProbes = false;
+			}
+		}
+		else {
+			_canUpdateSkybox = false;
+			_skyboxLerpFactor = 0f;
+			UpdateReflectionProbes();
+		}
+	}
+
+	private void UpdateReflectionProbes() {
+		foreach (Transform waterChild in _waters.transform)
+			waterChild.GetComponent<ReflectionProbe>()?.RenderProbe();
+
+		DynamicGI.UpdateEnvironment();
+	}
+
+	private void InitializeReset() {
+		ResetSkybox();
+		ResetBridges();
+	}
+
+	private void ResetBridges() {
+		_hasSwapedBridges = false;
+		_canSwapBridges = false;
+		_bridgeCommon.SetActive(true);
+		_bridgeDamaged.SetActive(false);
+	}
+
+	private void SwapBridge() {
+		if (!_hasSwapedBridges && _canSwapBridges) {
+			_bridgeCommon.SetActive(false);
+			_bridgeDamaged.SetActive(true);
+
+			_hasSwapedBridges = true;
+		}
+	}
 }

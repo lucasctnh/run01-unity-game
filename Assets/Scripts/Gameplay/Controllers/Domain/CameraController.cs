@@ -12,9 +12,9 @@ public class CameraController : MonoBehaviour {
 	private Vector3 _targetPosition = Vector3.zero;
 	private Vector3 _velocity = Vector3.zero;
 
-	private void OnEnable() => PlayerController.AfterSwitch += InvertCamera;
+	private void OnEnable() => PlayerController.OnInvertedPosition += InvertCamera;
 
-	private void OnDisable() => PlayerController.AfterSwitch -= InvertCamera;
+	private void OnDisable() => PlayerController.OnInvertedPosition -= InvertCamera;
 
 	private void Start() => _targetPosition = _defaultPosition;
 
@@ -23,10 +23,10 @@ public class CameraController : MonoBehaviour {
 			transform.position = Vector3.SmoothDamp(transform.position, _targetPosition, ref _velocity, _smoothTime);
 	}
 
-	public void InvertCamera() => _targetPosition = InvertDefaultPosition();
+	public void InvertCamera() => _targetPosition = InvertPosition();
 
-	private Vector3 InvertDefaultPosition() {
-		_defaultPosition = new Vector3(_defaultPosition.x, _defaultPosition.y * -1, _defaultPosition.z);
-		return _defaultPosition;
+	private Vector3 InvertPosition() {
+		_targetPosition = new Vector3(_targetPosition.x, _targetPosition.y * -1, _targetPosition.z);
+		return _targetPosition;
 	}
 }

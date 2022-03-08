@@ -24,7 +24,7 @@ public class InputsController : MonoBehaviour {
 	public void ButtonSwitch() => OnButtonSwitch?.Invoke();
 
 	public void Jump(InputAction.CallbackContext context) {
-		if (context.performed && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused)
+		if (context.performed && GameManager.Instance.IsGamePlayable)
 			OnJump?.Invoke();
 
 		HoldingJump(context);
@@ -38,7 +38,7 @@ public class InputsController : MonoBehaviour {
 	}
 
 	public void Switch(InputAction.CallbackContext context) {
-		if (context.performed && GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused) {
+		if (context.performed && GameManager.Instance.IsGamePlayable) {
 			_yDrag = context.ReadValue<float>();
 			if (_yDrag != 0)
 				OnSwitch?.Invoke(_yDrag);

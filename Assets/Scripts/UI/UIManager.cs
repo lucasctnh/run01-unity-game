@@ -55,7 +55,7 @@ public class UIManager : MonoBehaviour {
 
 	private void Update() {
 		_playButton.enabled = SkinsSystem.isCurrentSkinUnlocked;
-		_gameUI.SetActive(GameManager.Instance.isGameRunning && !GameManager.Instance.isGamePaused);
+		_gameUI.SetActive(GameManager.Instance.IsGamePlayable);
 		_lowGraphicsSign.SetActive(GameManager.Instance.isCurrentlyLowGraphics);
 	}
 

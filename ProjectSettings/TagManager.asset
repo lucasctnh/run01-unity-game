@@ -7,6 +7,8 @@ TagManager:
   - Obstacle
   - Collectable
   - Hitable Destroyer
+  - Collapse Destroyer
+  - Water
   layers:
   - Default
   - TransparentFX
@@ -17,8 +19,8 @@ TagManager:
   - Obstacle
   - Collectable
   - Ground
-  - Background
-  - 
+  - Destroyer
+  - Player
   - 
   - 
   - 
