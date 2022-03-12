@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	public static event Action OnInvertedPosition;
@@ -37,14 +38,17 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	[Tooltip("The vertical force multiplier for throwing player at game over")]
 	[SerializeField] private float _ragdollVerticalMultiplier = 2f;
 
+	[Header("Animation Settings")]
+	[Space]
+	[Tooltip("The amount in seconds to have a chance of a new idle animation pop up")]
+	[SerializeField] private float _idleAnimationRepeatRate = 5f;
+
 	[Header("Components Reference")]
 	[Space]
 	[SerializeField] private CameraController _camera;
 	[SerializeField] private Transform _swapBridgePoint;
 	[SerializeField] private Rigidbody _rigidbody;
-	[SerializeField] private Renderer _body;
-	[SerializeField] private Renderer _eyeL;
-	[SerializeField] private Renderer _eyeR;
+	[SerializeField] private List<Renderer> _renderers = new List<Renderer>();
 
 	private const float _GROUND_CHECK_RADIUS = .2f;
 
@@ -56,6 +60,8 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	private int _gravityDirection = 1;
 	private int _jumps = 1;
 	private bool _isHoldingJump = false;
+	private float _idleAnimationsTimer = 0;
+	private bool _canRagdollPlayer = false;
 
 	private void OnEnable() {
 		InputsController.OnJump += Jump;
@@ -64,7 +70,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		InputsController.OnButtonJump += ButtonJump;
 		InputsController.OnButtonSwitch += ButtonSwitch;
 		GameManager.OnPlay += OnPlay;
-		GameManager.OnGameOver += obj => RagdollPlayer();
+		GameManager.OnGameOver += obj => _canRagdollPlayer = true;
 	}
 
 	private void OnDisable() {
@@ -74,19 +80,22 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		InputsController.OnButtonJump -= ButtonJump;
 		InputsController.OnButtonSwitch -= ButtonSwitch;
 		GameManager.OnPlay -= OnPlay;
-		GameManager.OnGameOver -= obj => RagdollPlayer();
+		GameManager.OnGameOver -= obj => _canRagdollPlayer = true;
 	}
 
 	private void Awake() {
-		foreach (Material material in _body.materials)
-			_materials.Add(material);
-		_materials.Add(_eyeL.material);
-		_materials.Add(_eyeR.material);
+		foreach (Renderer renderer in _renderers) {
+			foreach (Material material in renderer.materials)
+				_materials.Add(material);
+		}
 	}
 
-	private void Start() => ResetPlayer();
+	private void Start() => ResetGravity();
 
 	private void FixedUpdate() {
+		if (_canRagdollPlayer)
+			RagdollPlayer();
+
 		if (!GameManager.Instance.IsGamePlayable)
 			return;
 
@@ -97,6 +106,9 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	}
 
 	private void Update() {
+		if (!GameManager.Instance.isGameRunning)
+			GameManager.CallRepeating(HandleIdleAnimation, ref _idleAnimationsTimer, _idleAnimationRepeatRate);
+
 		if (_canDissolveDown)
 			StartCoroutine(DissolveDown());
 		if (_canDissolveUp)
@@ -260,23 +272,24 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		return false;
 	}
 
-	private void ResetPlayer() {
-		ResetRagdoll();
-		ResetGravity();
-	}
-
-	private void ResetRagdoll() {
-		if (_rigidbody != null)
-			_rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
-	}
-
 	private void RagdollPlayer() {
+		GetComponent<Animator>().SetTrigger("Die");
+
 		if (_rigidbody != null) {
-			_rigidbody.constraints = RigidbodyConstraints.None;
 			_rigidbody.AddForce((Vector3.left * GameManager.Instance.playerSpeed * _ragdollHorizontalMultiplier) + (transform.up * _ragdollVerticalMultiplier),
 				ForceMode.VelocityChange);
 
 			ResetGravity();
 		}
+
+		_canRagdollPlayer = false;
+	}
+
+	private void HandleIdleAnimation() {
+		float idleEventMarking = Random.Range(0f, 1f);
+		if (idleEventMarking > 0f && idleEventMarking < 0.1)
+			GetComponent<Animator>().SetTrigger("IdleEvent1");
+		if (idleEventMarking > 0.9 && idleEventMarking < 1)
+			GetComponent<Animator>().SetTrigger("IdleEvent2");
 	}
 }
