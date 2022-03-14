@@ -12,6 +12,7 @@ public class Collectable : Hitable {
 		if (other.gameObject.CompareTag("Hitable Destroyer"))
 			_killAction(this);
 		if (other.gameObject.CompareTag("Player")) {
+			AudioManager.Instance.PlaySoundOneShot(Sound.Type.CoinPickUp, 2);
 			GameManager.Instance.IncreaseCoin();
 			_killAction(this);
 		}

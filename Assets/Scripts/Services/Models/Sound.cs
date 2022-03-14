@@ -9,6 +9,8 @@ public class Sound {
 		BGM,
 		Jump,
 		Switch,
+		Death,
+		CoinPickUp
 	}
 
 	public Type soundType;

@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		}
 	}
 
-	private void Start() => ResetGravity();
+	private void Start() => ResetPlayer();
 
 	private void FixedUpdate() {
 		if (_canRagdollPlayer)
@@ -272,10 +272,21 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		return false;
 	}
 
+	private void ResetPlayer() {
+		ResetRagdoll();
+		ResetGravity();
+	}
+
+	private void ResetRagdoll() {
+		if (_rigidbody != null)
+			_rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
+	}
+
 	private void RagdollPlayer() {
 		GetComponent<Animator>().SetTrigger("Die");
 
 		if (_rigidbody != null) {
+			_rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
 			_rigidbody.AddForce((Vector3.left * GameManager.Instance.playerSpeed * _ragdollHorizontalMultiplier) + (transform.up * _ragdollVerticalMultiplier),
 				ForceMode.VelocityChange);
 
