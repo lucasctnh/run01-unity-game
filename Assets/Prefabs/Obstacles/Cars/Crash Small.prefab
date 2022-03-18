@@ -326,6 +326,31 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5503299411546068004}
     m_Modifications:
+    - target: {fileID: 2528774244432531224, guid: a1b2c0484e30e1840bf3cb3cc690c81d,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.03557693
+      objectReference: {fileID: 0}
+    - target: {fileID: 2528774244432531224, guid: a1b2c0484e30e1840bf3cb3cc690c81d,
+        type: 3}
+      propertyPath: m_Size.z
+      value: 0.107465155
+      objectReference: {fileID: 0}
+    - target: {fileID: 2528774244432531224, guid: a1b2c0484e30e1840bf3cb3cc690c81d,
+        type: 3}
+      propertyPath: m_Center.x
+      value: -0.000000012498341
+      objectReference: {fileID: 0}
+    - target: {fileID: 2528774244432531224, guid: a1b2c0484e30e1840bf3cb3cc690c81d,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 0.077755444
+      objectReference: {fileID: 0}
+    - target: {fileID: 2528774244432531224, guid: a1b2c0484e30e1840bf3cb3cc690c81d,
+        type: 3}
+      propertyPath: m_Center.z
+      value: -0.017592756
+      objectReference: {fileID: 0}
     - target: {fileID: 7460409774114867352, guid: a1b2c0484e30e1840bf3cb3cc690c81d,
         type: 3}
       propertyPath: m_Name
@@ -394,6 +419,7 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 1839628757223856779, guid: a1b2c0484e30e1840bf3cb3cc690c81d, type: 3}
     - {fileID: 7622502761485992767, guid: a1b2c0484e30e1840bf3cb3cc690c81d, type: 3}
+    - {fileID: 2528774244432531224, guid: a1b2c0484e30e1840bf3cb3cc690c81d, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a1b2c0484e30e1840bf3cb3cc690c81d, type: 3}
 --- !u!4 &2551487891614168912 stripped
 Transform:

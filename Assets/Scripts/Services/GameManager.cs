@@ -60,6 +60,9 @@ public class GameManager : MonoBehaviour {
 	[Tooltip("The threshold amount of Score to change from stage 2 to stage 3")]
 	[SerializeField] private int _stage2Threshold = 120;
 
+	[Tooltip("The threshold amount of Score to go back from stage 3 to stage 1")]
+	[SerializeField] private int _remakeStageThreshold = 240;
+
 	[Header("Overall Settings")]
 	[Space]
 	[Tooltip("Amount of speed which the skybox will rotate")]
@@ -95,6 +98,7 @@ public class GameManager : MonoBehaviour {
 	private float _difficultyTimer = 0f;
 	private float _scoreTimer = 0f;
 	private int _score = 0;
+	private int _scoreShadow = 0; // for handling stage changes
 	private int _bestScore = 0;
 	private int _coins = 0;
 
@@ -106,9 +110,15 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	private void OnEnable() => PlayerController.OnReachedSwapPoint += SwapBridge;
+	private void OnEnable() {
+		PlayerController.OnReachedSwapPoint += SwapBridge;
+		OnUpdateScore += score => IncreaseShadowScore();
+	}
 
-	private void OnDisable() => PlayerController.OnReachedSwapPoint -= SwapBridge;
+	private void OnDisable() {
+		PlayerController.OnReachedSwapPoint -= SwapBridge;
+		OnUpdateScore -= score => IncreaseShadowScore();
+	}
 
 	private void Awake() {
 		if (Instance != null) {
@@ -123,8 +133,6 @@ public class GameManager : MonoBehaviour {
 
 	private void Start() {
 		InitializeReset();
-
-		AudioManager.Instance.PlaySound(Sound.Type.BGM, 1);
 
 		SaveData data = SaveSystem.Load();
 		if (data != null)
@@ -159,6 +167,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void Play() {
+		AudioManager.Instance.PlaySound(Sound.Type.BGM1, 1);
+
 		isGameRunning = true;
 		isGamePaused = false;
 
@@ -168,6 +178,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void Pause() {
+		AudioManager.Instance.PauseAllTracks();
+
 		isGamePaused = true;
 
 		OnPause?.Invoke();
@@ -176,6 +188,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void Resume() {
+		AudioManager.Instance.ResumeAllTracks();
+
 		isGamePaused = false;
 
 		OnResume?.Invoke();
@@ -183,8 +197,10 @@ public class GameManager : MonoBehaviour {
 		UnfreezeTime();
 	}
 
-	public void GameOver() {
-		if (!IsGamePlayable) // to avoid GameOver being called twice // TODO: refactor
+	public void GameOver(Sound.Type gameOverSound = Sound.Type.None) {
+		AudioManager.Instance.PlaySoundOneShot(gameOverSound, 2);
+
+		if (!IsGamePlayable) // to avoid GameOver more than once
 			return;
 
 		isGameRunning = false;
@@ -195,11 +211,16 @@ public class GameManager : MonoBehaviour {
 
 		SaveSystem.Save(_bestScore, _coins);
 
-		AudioManager.Instance.StopSound(1);
-		//FreezeTime();
+		AudioManager.Instance.StopAllTracks();
 	}
 
-	public void PlayAgain() => StartCoroutine(ReloadSceneAfterTransition());
+	public void PlayAgain() {
+		isGameRunning = false;
+		isGamePaused = true;
+		UnfreezeTime();
+
+		StartCoroutine(ReloadSceneAfterTransition());
+	}
 
 	public void IncreaseCoin() {
 		_coins++;
@@ -213,7 +234,10 @@ public class GameManager : MonoBehaviour {
 		SaveSystem.Save(_bestScore, _coins);
 	}
 
-	public void ChangeBGMVolume(float value) => OnUpdateVolume?.Invoke(1, value);
+	public void ChangeBGMVolume(float value) {
+		OnUpdateVolume?.Invoke(1, value); // TODO: refactor
+		OnUpdateVolume?.Invoke(3, value);
+	}
 
 	public void ChangeSFXVolume(float value) => OnUpdateVolume?.Invoke(2, value);
 
@@ -252,8 +276,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void InitializeTrackVolumes() {
-		InitializeTrackVolume(1);
+		InitializeTrackVolume(1); // TODO: refactor
 		InitializeTrackVolume(2);
+		InitializeTrackVolume(3);
 	}
 
 	private void InitializeTrackVolume(int track) => OnUpdateVolume?.Invoke(track, AudioManager.Instance.GetTrackVolume(track));
@@ -269,8 +294,9 @@ public class GameManager : MonoBehaviour {
 		isCurrentlyLowGraphics = data.isLowGraphics;
 		AssignQuality();
 
-		OnUpdateVolume?.Invoke(1, data.bgmVolume);
+		OnUpdateVolume?.Invoke(1, data.bgmVolume); // TODO: refactor
 		OnUpdateVolume?.Invoke(2, data.sfxVolume);
+		OnUpdateVolume?.Invoke(3, data.bgmVolume);
 	}
 
 	private bool IsThereNewBestScore() {
@@ -300,17 +326,25 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void HandleStages() {
-		if (_score > _stage2Threshold && _stage != Stages.BridgeCollapse) {
+		if (_scoreShadow > _remakeStageThreshold)
+			RemakeStages();
+		if (_scoreShadow > _stage2Threshold && _scoreShadow <= _remakeStageThreshold && _stage != Stages.BridgeCollapse) {
+			ChangeState(Stages.BridgeCollapse, Sound.Type.BGM3);
 			_canSwapBridges = true;
-			ChangeState(Stages.BridgeCollapse);
 		}
-		if ((_score > _stage1Threshold && _score <= _stage2Threshold) && _stage != Stages.CarCrashAndCrystals)
-			ChangeState(Stages.CarCrashAndCrystals);
-		if ((_score > 0 && _score <= _stage1Threshold) && _stage != Stages.DynamicCars)
-			ChangeState(Stages.DynamicCars);
+		if ((_scoreShadow > _stage1Threshold && _scoreShadow <= _stage2Threshold) && _stage != Stages.CarCrashAndCrystals)
+			ChangeState(Stages.CarCrashAndCrystals, Sound.Type.BGM2);
+		if ((_scoreShadow > 0 && _scoreShadow <= _stage1Threshold) && _stage != Stages.DynamicCars) {
+			ChangeState(Stages.DynamicCars, Sound.Type.BGM1);
+			_canSwapBridges = true;
+		}
 	}
 
-	private void ChangeState(Stages newStage) {
+	private void ChangeState(Stages newStage, Sound.Type newBGM) {
+		AudioManager.Instance.ChangeSoundWithFade(newBGM, 1);
+
+		_hasSwapedBridges = false;
+
 		_lastStage = _stage;
 		_stage = newStage;
 
@@ -368,10 +402,25 @@ public class GameManager : MonoBehaviour {
 
 	private void SwapBridge() {
 		if (!_hasSwapedBridges && _canSwapBridges) {
-			_bridgeCommon.SetActive(false);
-			_bridgeDamaged.SetActive(true);
+			if (_stage == Stages.BridgeCollapse) {
+				_bridgeCommon.SetActive(false);
+				_bridgeDamaged.SetActive(true);
+			}
+			else if (_stage == Stages.DynamicCars){
+				_bridgeCommon.SetActive(true);
+				_bridgeDamaged.SetActive(false);
+			}
 
 			_hasSwapedBridges = true;
 		}
+	}
+
+	private void IncreaseShadowScore() => _scoreShadow++;
+
+	private void RemakeStages() {
+		_scoreShadow = 0;
+		_stage1Threshold += 30;
+		_stage2Threshold += 30;
+		_remakeStageThreshold += 30;
 	}
 }

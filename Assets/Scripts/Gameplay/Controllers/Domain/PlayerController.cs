@@ -122,7 +122,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		if (other.gameObject.CompareTag("Finish"))
 			GameManager.Instance.GameOver();
 		if (other.gameObject.CompareTag("Water"))
-			print("blup");
+			GameManager.Instance.GameOver(Sound.Type.WaterDrip);
 	}
 
 	public void ButtonJump() {

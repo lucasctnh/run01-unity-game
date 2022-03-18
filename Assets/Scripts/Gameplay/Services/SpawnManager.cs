@@ -57,6 +57,14 @@ public class SpawnManager : MonoBehaviour {
 			Hitable hitable = pool.Get();
 			hitable.GetComponent<Hitable>().SetKill(hitable => Kill(pool, hitable));
 
+			AudioSource[] audioSources = hitable.GetComponents<AudioSource>(); // TODO: abstract
+			if (audioSources != null && audioSources.Length != 0) {
+				foreach (AudioSource audioSource in audioSources) {
+					float obstacleVolume = AudioManager.Instance.GetTrackVolume(2) == 0 ? 0 : AudioManager.Instance.GetTrackVolume(2) + .2f;
+					audioSource.volume = obstacleVolume;
+				}
+			}
+
 			if (!CheckShouldSpawn(hitable))
 				pool.Release(hitable);
 		}

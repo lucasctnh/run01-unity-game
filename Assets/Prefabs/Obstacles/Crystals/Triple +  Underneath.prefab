@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4206956457488469764}
   - component: {fileID: 2886859494177610892}
   - component: {fileID: 6752096870282757279}
+  - component: {fileID: 6968590360066984598}
   m_Layer: 6
   m_Name: Triple +  Underneath
   m_TagString: Obstacle
@@ -52,7 +53,7 @@ MonoBehaviour:
   _stage: 2
   _hasSecondaryStage: 1
   _secondaryStage: 3
-  _spawnRateMultiplier: 1
+  _spawnRateMultiplier: 0.594
   _angleThreshold: 0
 --- !u!54 &6752096870282757279
 Rigidbody:
@@ -70,6 +71,102 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 124
   m_CollisionDetection: 0
+--- !u!82 &6968590360066984598
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8640537331334146251}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: fade0e2529f0a6f4fa5c5d57e9dda892, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 0.9
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 0.8
+  MinDistance: 15
+  MaxDistance: 50
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &223638188661932170
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -77,10 +174,55 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4206956457488469764}
     m_Modifications:
+    - target: {fileID: 1283933992583772699, guid: f4821fc4ceb2cf34298c2183a3a41344,
+        type: 3}
+      propertyPath: prewarm
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3176966521104024286, guid: f4821fc4ceb2cf34298c2183a3a41344,
+        type: 3}
+      propertyPath: prewarm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4845247116919978179, guid: f4821fc4ceb2cf34298c2183a3a41344,
         type: 3}
       propertyPath: m_Name
       value: Triple Jump
+      objectReference: {fileID: 0}
+    - target: {fileID: 6762805422782675732, guid: f4821fc4ceb2cf34298c2183a3a41344,
+        type: 3}
+      propertyPath: prewarm
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801032204609644763, guid: f4821fc4ceb2cf34298c2183a3a41344,
+        type: 3}
+      propertyPath: Loop
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801032204609644763, guid: f4821fc4ceb2cf34298c2183a3a41344,
+        type: 3}
+      propertyPath: MaxDistance
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801032204609644763, guid: f4821fc4ceb2cf34298c2183a3a41344,
+        type: 3}
+      propertyPath: MinDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801032204609644763, guid: f4821fc4ceb2cf34298c2183a3a41344,
+        type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801032204609644763, guid: f4821fc4ceb2cf34298c2183a3a41344,
+        type: 3}
+      propertyPath: DopplerLevel
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801032204609644763, guid: f4821fc4ceb2cf34298c2183a3a41344,
+        type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8959341882471628955, guid: f4821fc4ceb2cf34298c2183a3a41344,
         type: 3}
@@ -154,6 +296,36 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4206956457488469764}
     m_Modifications:
+    - target: {fileID: -5331319668848076308, guid: 436bcb29f3b3755468ca4168bd006a57,
+        type: 3}
+      propertyPath: Loop
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5331319668848076308, guid: 436bcb29f3b3755468ca4168bd006a57,
+        type: 3}
+      propertyPath: MaxDistance
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: -5331319668848076308, guid: 436bcb29f3b3755468ca4168bd006a57,
+        type: 3}
+      propertyPath: MinDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -5331319668848076308, guid: 436bcb29f3b3755468ca4168bd006a57,
+        type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: -5331319668848076308, guid: 436bcb29f3b3755468ca4168bd006a57,
+        type: 3}
+      propertyPath: DopplerLevel
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -5331319668848076308, guid: 436bcb29f3b3755468ca4168bd006a57,
+        type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 98127512473213661, guid: 436bcb29f3b3755468ca4168bd006a57,
         type: 3}
       propertyPath: m_IsActive

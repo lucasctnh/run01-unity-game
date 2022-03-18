@@ -142,6 +142,7 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 9146107689906248512, guid: a876d7f84fab88f469173590b5249250, type: 3}
     - {fileID: 3053767788755527953, guid: a876d7f84fab88f469173590b5249250, type: 3}
+    - {fileID: -55176713401164352, guid: a876d7f84fab88f469173590b5249250, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a876d7f84fab88f469173590b5249250, type: 3}
 --- !u!4 &8310600246252982911 stripped
 Transform:
@@ -317,6 +318,7 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 5150680597672498671, guid: dcacde10cf276de4aadf503148087718, type: 3}
     - {fileID: 3536337047875863294, guid: dcacde10cf276de4aadf503148087718, type: 3}
+    - {fileID: 2614621628290023102, guid: dcacde10cf276de4aadf503148087718, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: dcacde10cf276de4aadf503148087718, type: 3}
 --- !u!4 &8132874195128160234 stripped
 Transform:

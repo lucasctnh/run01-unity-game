@@ -6,11 +6,15 @@ using UnityEngine;
 [Serializable]
 public class Sound {
 	public enum Type {
-		BGM,
+		None,
+		BGM1,
+		BGM2,
+		BGM3,
 		Jump,
 		Switch,
 		Death,
-		CoinPickUp
+		CoinPickUp,
+		WaterDrip
 	}
 
 	public Type soundType;

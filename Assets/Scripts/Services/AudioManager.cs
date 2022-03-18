@@ -10,6 +10,9 @@ public class AudioManager : MonoBehaviour {
 	[Tooltip("The tracks available to play sounds. By default, the 1st is for BGM and the 2nd is for SFX.")]
 	[SerializeField] private List<AudioSource> _tracks = new List<AudioSource>();
 
+	[Tooltip("Duration in seconds of the audio fade ins and outs.")]
+	[SerializeField] private float _fadeTime = 1f;
+
 	private void OnEnable() => GameManager.OnUpdateVolume += (track, volume) => ChangeTrackVolume(track, volume);
 
 	private void OnDisable() => GameManager.OnUpdateVolume -= (track, volume) => ChangeTrackVolume(track, volume);
@@ -23,6 +26,42 @@ public class AudioManager : MonoBehaviour {
 		Instance = this;
 	}
 
+	public void PauseTrack(int trackNumber) {
+		AudioSource audioSource = GetTrack(trackNumber);
+
+		if (audioSource != null)
+			audioSource.Pause();
+	}
+
+	public void ResumeTrack(int trackNumber) {
+		AudioSource audioSource = GetTrack(trackNumber);
+
+		if (audioSource != null)
+			audioSource.UnPause();
+	}
+
+	public void StopTrack(int trackNumber) {
+		AudioSource audioSource = GetTrack(trackNumber);
+
+		if (audioSource != null)
+			audioSource.Stop();
+	}
+
+	public void PauseAllTracks() {
+		foreach (AudioSource track in FindObjectsOfType<AudioSource>())
+			PauseTrack(track);
+	}
+
+	public void ResumeAllTracks() {
+		foreach (AudioSource track in FindObjectsOfType<AudioSource>())
+			ResumeTrack(track);
+	}
+
+	public void StopAllTracks() {
+		foreach (AudioSource track in FindObjectsOfType<AudioSource>())
+			StopTrack(track);
+	}
+
 	public void PlaySound(Sound.Type soundType, int trackNumber) {
 		AudioSource audioSource = GetTrack(trackNumber);
 		audioSource.clip = GetAudioClip(soundType);
@@ -30,12 +69,6 @@ public class AudioManager : MonoBehaviour {
 
 		if (!audioSource.isPlaying)
 			audioSource.Play();
-	}
-
-	public void StopSound(int trackNumber) {
-		AudioSource audioSource = GetTrack(trackNumber);
-		if (audioSource != null && audioSource.isPlaying)
-			audioSource.Stop();
 	}
 
 	public void PlaySoundOneShot(Sound.Type soundType, int trackNumber) {
@@ -47,6 +80,8 @@ public class AudioManager : MonoBehaviour {
 	public float GetTrackVolume(int trackNumber) {
 		return GetTrack(trackNumber).volume;
 	}
+
+	public void ChangeSoundWithFade(Sound.Type soundType, int trackNumber) => StartCoroutine(StartChangeSoundWithFade(soundType, trackNumber, GetTrackVolume(trackNumber)));
 
 	private AudioSource GetTrack(int trackNumber) {
 		return _tracks[trackNumber - 1];
@@ -66,5 +101,38 @@ public class AudioManager : MonoBehaviour {
 		AudioSource audioSource = GetTrack(trackNumber);
 		if (audioSource != null)
 			audioSource.volume = volume;
+	}
+
+	private void PauseTrack(AudioSource track) => track.Pause();
+
+	private void ResumeTrack(AudioSource track) => track.UnPause();
+
+	private void StopTrack(AudioSource track) => track.Stop();
+
+	private IEnumerator StartChangeSoundWithFade(Sound.Type soundType, int trackNumber, float targetVolume) {
+		AudioSource audioSource = GetTrack(trackNumber);
+
+		yield return Fade(audioSource, 0);
+
+		audioSource.clip = GetAudioClip(soundType);
+		audioSource.loop = true;
+
+		if (!audioSource.isPlaying)
+			audioSource.Play();
+
+		yield return Fade(audioSource, targetVolume);
+	}
+
+	private IEnumerator Fade(AudioSource track, float targetVolume) {
+		float currentTime = 0;
+		float start = track.volume;
+
+		while (currentTime < _fadeTime) {
+			currentTime += Time.deltaTime;
+			track.volume = Mathf.Lerp(start, targetVolume, currentTime / _fadeTime);
+			yield return null;
+		}
+
+		yield break;
 	}
 }

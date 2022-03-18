@@ -15,7 +15,7 @@ public class AttachedObstacle : MonoBehaviour {
 					break;
 				}
 				else
-					GameManager.Instance.GameOver();
+					GameManager.Instance.GameOver(Sound.Type.Death);
 			}
 		}
 	}

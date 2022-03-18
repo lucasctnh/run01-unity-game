@@ -20,10 +20,8 @@ public class Obstacle : Hitable {
 					other.gameObject.GetComponent<PlayerController>().RechargeJumps();
 					break;
 				}
-				else {
-					AudioManager.Instance.PlaySoundOneShot(Sound.Type.Death, 2);
-					GameManager.Instance.GameOver();
-				}
+				else
+					GameManager.Instance.GameOver(Sound.Type.Death);
 			}
 		}
 	}

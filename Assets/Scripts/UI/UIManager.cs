@@ -122,7 +122,7 @@ public class UIManager : MonoBehaviour {
 	private void UpdateVolumeSlider(int track, float volume) {
 		if (track == 1)
 			_bgmSlider.value = volume;
-		else
+		else if (track == 2)
 			_sfxSlider.value = volume;
 	}
 }
