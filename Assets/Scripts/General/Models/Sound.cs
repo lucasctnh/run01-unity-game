@@ -14,7 +14,8 @@ public class Sound {
 		Switch,
 		Death,
 		CoinPickUp,
-		WaterDrip
+		WaterDrip,
+		UIClick
 	}
 
 	public Type soundType;

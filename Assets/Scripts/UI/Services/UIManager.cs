@@ -63,6 +63,8 @@ public class UIManager : MonoBehaviour {
 
 	public void ChangeSkinByRight() => OnChangeSkin?.Invoke(true);
 
+	public void PlayButtonClick() => AudioManager.Instance.PlaySoundOneShot(Sound.Type.UIClick, 2);
+
 	private void OnPlay() => SetMenusVisibility(false, false, false);
 
 	private void OnPause() => SetMenusVisibility(false, true, false);

@@ -197,7 +197,7 @@ public class GameManager : MonoBehaviour {
 		UnfreezeTime();
 	}
 
-	public void GameOver(Sound.Type gameOverSound = Sound.Type.None) {
+	public void GameOver(Sound.Type gameOverSound = Sound.Type.None) { // TODO: make every UI button function not work when !IsGamePlayable (cuz of fade)
 		AudioManager.Instance.PlaySoundOneShot(gameOverSound, 2);
 
 		if (!IsGamePlayable) // to avoid GameOver more than once
