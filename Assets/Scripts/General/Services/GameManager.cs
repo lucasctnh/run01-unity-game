@@ -183,6 +183,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void Pause() {
+		// if (isGamePaused)
+		// 	return; // HIDE SETTINGS BUTTON
+
 		AudioManager.Instance.PauseAllTracks();
 
 		isGamePaused = true;
