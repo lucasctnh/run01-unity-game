@@ -74,6 +74,9 @@ public class GameManager : MonoBehaviour {
 	[Tooltip("Duration in seconds for the end transition to finish")]
 	[SerializeField] private float _endTransitionDuration = 1f;
 
+	[Tooltip("Duration in seconds for the scale transition to finish")]
+	[SerializeField] private float _scaleTransitionDuration = .5f;
+
 	[Tooltip("The targeted fps limit")]
 	[SerializeField] private int _targetFrameRate = 60;
 
@@ -86,7 +89,9 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private List<Color> _skyboxColors = new List<Color>();
 	[SerializeField] private GameObject _bridgeCommon;
 	[SerializeField] private GameObject _bridgeDamaged;
-	[SerializeField] private Animator _endTransition;
+	[SerializeField] private Animator _endTransitionAnimator;
+	[SerializeField] private Animator _pauseAnimator;
+	[SerializeField] private Animator _gameOverAnimator;
 
 	private Stages _stage = Stages.GameNotStarted;
 	private Stages _lastStage = Stages.GameNotStarted;
@@ -182,9 +187,7 @@ public class GameManager : MonoBehaviour {
 
 		isGamePaused = true;
 
-		OnPause?.Invoke();
-
-		FreezeTime();
+		StartCoroutine(TransitionedPause());
 	}
 
 	public void Resume() {
@@ -192,9 +195,7 @@ public class GameManager : MonoBehaviour {
 
 		isGamePaused = false;
 
-		OnResume?.Invoke();
-
-		UnfreezeTime();
+		StartCoroutine(TransitionedResume());
 	}
 
 	public void GameOver(Sound.Type gameOverSound = Sound.Type.None) { // TODO: make every UI button function not work when !IsGamePlayable (cuz of fade)
@@ -269,11 +270,34 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private IEnumerator ReloadSceneAfterTransition() {
-		_endTransition.SetTrigger("Fade");
+		_endTransitionAnimator.SetTrigger("Fade");
 		yield return new WaitForSeconds(_endTransitionDuration);
 
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
+
+	private IEnumerator TransitionedPause() { // TODO: refactor (maybe TransitionedFunction and general transitions)
+		OnPause?.Invoke();
+		yield return WaitScaleUpTransition(_pauseAnimator);
+		FreezeTime();
+	}
+
+	private IEnumerator TransitionedResume() {
+		UnfreezeTime();
+		yield return WaitScaleDownTransition(_pauseAnimator);
+		OnResume?.Invoke();
+	}
+
+	private IEnumerator WaitScaleUpTransition(Animator animator) {
+		animator.SetTrigger("ScaleUpBouncy");
+		yield return new WaitForSeconds(_scaleTransitionDuration);
+	}
+
+	private IEnumerator WaitScaleDownTransition(Animator animator) {
+		animator.SetTrigger("ScaleDown");
+		yield return new WaitForSeconds(_scaleTransitionDuration);
+	}
+
 
 	private void InitializeTrackVolumes() {
 		InitializeTrackVolume(1); // TODO: refactor

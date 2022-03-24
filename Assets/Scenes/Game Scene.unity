@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.4079782, g: 0.23051775, b: 0.09816649, a: 1}
+  m_IndirectSpecularColor: {r: 0.4081303, g: 0.2305575, b: 0.098154075, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 24332072}
   - component: {fileID: 24332074}
   - component: {fileID: 24332073}
+  - component: {fileID: 24332075}
   m_Layer: 0
   m_Name: Game Over Menu
   m_TagString: Untagged
@@ -205,6 +206,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 24332071}
   m_CullTransparentMesh: 1
+--- !u!95 &24332075
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24332071}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 18875018ae6a0d346b2fc17e548283f0, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &55367151
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,7 +620,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &153646179
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3043,7 +3064,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1154330865}
   m_HandleRect: {fileID: 1154330864}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0.9999721
   m_Size: 0.8045197
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3459,6 +3480,7 @@ GameObject:
   - component: {fileID: 729418406}
   - component: {fileID: 729418408}
   - component: {fileID: 729418407}
+  - component: {fileID: 729418409}
   m_Layer: 0
   m_Name: Pause Menu
   m_TagString: Untagged
@@ -3483,7 +3505,7 @@ RectTransform:
   - {fileID: 2093995140}
   - {fileID: 55367152}
   m_Father: {fileID: 2077938532}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -3528,6 +3550,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 729418405}
   m_CullTransparentMesh: 1
+--- !u!95 &729418409
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 729418405}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 18875018ae6a0d346b2fc17e548283f0, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &756992968
 GameObject:
   m_ObjectHideFlags: 0
@@ -5779,8 +5821,8 @@ RectTransform:
   m_Father: {fileID: 566969102}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.19548029}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0.1954749}
+  m_AnchorMax: {x: 1, y: 0.9999941}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -7214,7 +7256,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000061035156}
+  m_AnchoredPosition: {x: 0, y: 0.0038452148}
   m_SizeDelta: {x: 0, y: 135.6242}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1583014503
@@ -8946,6 +8988,7 @@ MonoBehaviour:
   _skyboxSpeed: 0.8
   _skyboxBlendDuration: 2
   _endTransitionDuration: 1
+  _scaleTransitionDuration: 0.5
   _targetFrameRate: 60
   _lowGraphicsPipeline: {fileID: 11400000, guid: 2a40a6918c723f84694e87d798ea808f,
     type: 2}
@@ -8959,7 +9002,9 @@ MonoBehaviour:
   - {r: 0.19530974, g: 0.20331049, b: 0.31132078, a: 0.5019608}
   _bridgeCommon: {fileID: 947190832}
   _bridgeDamaged: {fileID: 1272062275}
-  _endTransition: {fileID: 153646180}
+  _endTransitionAnimator: {fileID: 153646180}
+  _pauseAnimator: {fileID: 729418409}
+  _gameOverAnimator: {fileID: 24332075}
 --- !u!114 &1931900197 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 981752182999193, guid: bc53ca236ddc2f94b8dc1fefb899fe65,
@@ -9877,8 +9922,8 @@ RectTransform:
   m_Children:
   - {fileID: 553483056}
   - {fileID: 24332072}
-  - {fileID: 729418406}
   - {fileID: 2094656412}
+  - {fileID: 729418406}
   - {fileID: 153646179}
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -10025,7 +10070,7 @@ RectTransform:
   - {fileID: 1578617823}
   - {fileID: 1953492351}
   m_Father: {fileID: 2077938532}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

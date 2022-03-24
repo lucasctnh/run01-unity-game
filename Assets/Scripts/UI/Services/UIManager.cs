@@ -55,7 +55,7 @@ public class UIManager : MonoBehaviour {
 
 	private void Update() {
 		_playButton.enabled = SkinsSystem.isCurrentSkinUnlocked;
-		_gameUI.SetActive(GameManager.Instance.IsGamePlayable);
+		_gameUI.SetActive(GameManager.Instance.isGameRunning);
 		_lowGraphicsSign.SetActive(GameManager.Instance.isCurrentlyLowGraphics);
 	}
 
@@ -67,7 +67,12 @@ public class UIManager : MonoBehaviour {
 
 	private void OnPlay() => SetMenusVisibility(false, false, false);
 
-	private void OnPause() => SetMenusVisibility(false, true, false);
+	private void OnPause() {
+		SetMenusVisibility(false, true, false);
+
+		if (!GameManager.Instance.isGameRunning) // TODO: refactor (abstract)
+			SetMenuVisibility(_initMenu, true);
+	}
 
 	private void OnResume() {
 		SetMenusVisibility(false, false, false);
