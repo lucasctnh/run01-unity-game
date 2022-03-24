@@ -4,6 +4,6 @@ using UnityEngine;
 
 [System.Serializable]
 public class Skin {
-	public Material material;
+	public Material[] skinsMaterials;
 	public Condition unlockCondition;
 }

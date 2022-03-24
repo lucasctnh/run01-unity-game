@@ -7,7 +7,7 @@ using TMPro;
 public class SkinsSystem : MonoBehaviour { // TODO: refactorate
 	public static bool isCurrentSkinUnlocked = true;
 
-	[SerializeField] private GameObject _player;
+	[SerializeField] private Renderer _playerRenderer;
 	[SerializeField] private List<Skin> _skins = new List<Skin>();
 	[SerializeField] private GameObject _unlockGroup;
 	[SerializeField] private Button _unlockButton;
@@ -65,8 +65,9 @@ public class SkinsSystem : MonoBehaviour { // TODO: refactorate
 	private void OnChangeSkin(bool direction) {
 		WalkOnSkinList(direction);
 		HandleUnlockGroup();
-		if (_player != null)
-			_player.GetComponent<Renderer>().material = _skins[_currentIndex].material;
+
+		if (_playerRenderer != null)
+			_playerRenderer.materials = _skins[_currentIndex].skinsMaterials;
 	}
 
 	private void WalkOnSkinList(bool direction) {
@@ -94,9 +95,7 @@ public class SkinsSystem : MonoBehaviour { // TODO: refactorate
 
 	private void ChangeUnlockGroupVisibility(bool visibility) => _unlockGroup.SetActive(visibility);
 
-	private void UpdateIsCurrentSkinUnlocked() {
-		isCurrentSkinUnlocked = _skins[_currentIndex].unlockCondition.isUnlocked;
-	}
+	private void UpdateIsCurrentSkinUnlocked() => isCurrentSkinUnlocked = _skins[_currentIndex].unlockCondition.isUnlocked;
 
 	private void UpdateUnlockPhrase() => _unlockPhraseText.text = _skins[_currentIndex].unlockCondition.phrase;
 }
