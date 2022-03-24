@@ -128,7 +128,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6790331914295150748}
   m_Layer: 8
-  m_Name: Bridge Clean
+  m_Name: Bridge_Clean
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
