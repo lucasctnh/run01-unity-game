@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 
 public class SkinsSystem : MonoBehaviour { // TODO: refactorate
+	public static event Action OnEndOfChangeSkin;
 	public static bool isCurrentSkinUnlocked = true;
 
 	[SerializeField] private Renderer _playerRenderer;
@@ -68,6 +70,8 @@ public class SkinsSystem : MonoBehaviour { // TODO: refactorate
 
 		if (_playerRenderer != null)
 			_playerRenderer.materials = _skins[_currentIndex].skinsMaterials;
+
+		OnEndOfChangeSkin?.Invoke();
 	}
 
 	private void WalkOnSkinList(bool direction) {

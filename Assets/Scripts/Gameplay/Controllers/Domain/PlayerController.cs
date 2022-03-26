@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	[SerializeField] private CameraController _camera;
 	[SerializeField] private Transform _swapBridgePoint;
 	[SerializeField] private Rigidbody _rigidbody;
-	[SerializeField] private List<Renderer> _renderers = new List<Renderer>();
+	[SerializeField] private Renderer _renderer;
 
 	private const float _GROUND_CHECK_RADIUS = .2f;
 
@@ -71,6 +71,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		InputsController.OnButtonSwitch += ButtonSwitch;
 		GameManager.OnPlay += OnPlay;
 		GameManager.OnGameOver += obj => _canRagdollPlayer = true;
+		SkinsSystem.OnEndOfChangeSkin += AssignMaterials;
 	}
 
 	private void OnDisable() {
@@ -81,14 +82,10 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		InputsController.OnButtonSwitch -= ButtonSwitch;
 		GameManager.OnPlay -= OnPlay;
 		GameManager.OnGameOver -= obj => _canRagdollPlayer = true;
+		SkinsSystem.OnEndOfChangeSkin -= AssignMaterials;
 	}
 
-	private void Awake() {
-		foreach (Renderer renderer in _renderers) {
-			foreach (Material material in renderer.materials)
-				_materials.Add(material);
-		}
-	}
+	private void Awake() => AssignMaterials();
 
 	private void Start() => ResetPlayer();
 
@@ -145,6 +142,13 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	public void RechargeJumps() {
 		GetComponent<Animator>().SetBool("Jump", false);
 		_jumps = 1;
+	}
+
+	public void AssignMaterials() {
+		_materials.Clear();
+
+		foreach (Material material in _renderer.materials)
+			_materials.Add(material);
 	}
 
 	private IEnumerator DissolveDown() {
