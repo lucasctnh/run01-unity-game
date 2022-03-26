@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour {
 	public static event Action<int> OnUpdateScore;
 	public static event Action<int> OnUpdateCoins;
 	public static event Action<int> OnUpdateFinalScore;
+	public static event Action OnChangedQuality;
 
 	public Stages CurrentStage { get { return _stage; } }
 	public int BestScore { get { return _bestScore; } }
@@ -255,6 +256,8 @@ public class GameManager : MonoBehaviour {
 			ChangeQualityToLow();
 		else
 			ChangeQualityToHigh();
+
+		OnChangedQuality?.Invoke();
 	}
 
 	private void ChangeQualityToLow() {

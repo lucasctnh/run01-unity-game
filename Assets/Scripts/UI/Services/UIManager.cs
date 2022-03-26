@@ -56,6 +56,7 @@ public class UIManager : MonoBehaviour {
 		GameManager.OnUpdateCoins += coins => UpdateCoins(coins);
 		GameManager.OnUpdateFinalScore += finalScore => UpdateFinalScore(finalScore);
 		GameManager.OnUpdateVolume += (track, volume) => UpdateVolumeSlider(track, volume);
+		GameManager.OnChangedQuality += SelectPauseMenu;
 	}
 
 	private void OnDisable() {
@@ -69,6 +70,7 @@ public class UIManager : MonoBehaviour {
 		GameManager.OnUpdateCoins -= coins => UpdateCoins(coins);
 		GameManager.OnUpdateFinalScore -= finalScore => UpdateFinalScore(finalScore);
 		GameManager.OnUpdateVolume -= (track, volume) => UpdateVolumeSlider(track, volume);
+		GameManager.OnChangedQuality -= SelectPauseMenu;
 	}
 
 	private void Start() => SetMenusVisibility(true, false, false);
@@ -96,10 +98,13 @@ public class UIManager : MonoBehaviour {
 
 	public void OnPointerExitPauseMenu() => _isPointerOnPauseMenu = false;
 
+	public void SelectPauseMenu() => EventSystem.current.SetSelectedGameObject(_pauseMenu);
+
 	private void OnPlay() => SetMenusVisibility(false, false, false);
 
 	private void OnPause() {
-		EventSystem.current.SetSelectedGameObject(_pauseMenu);
+		SelectPauseMenu();
+
 		SetMenusVisibility(false, true, false);
 
 		if (!GameManager.Instance.isGameRunning) // TODO: refactor (abstract)
