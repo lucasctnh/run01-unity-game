@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private RenderPipelineAsset _lowGraphicsPipeline;
 	[SerializeField] private RenderPipelineAsset _highGraphicsPipeline;
 	[SerializeField] private SpawnManager _obstacleSpawnManager;
-	[SerializeField] private GameObject _waters;
+	[SerializeField] private List<GameObject> _waters = new List<GameObject>();
 	[SerializeField] private List<Color> _skyboxColors = new List<Color>();
 	[SerializeField] private GameObject _bridgeCommon;
 	[SerializeField] private GameObject _bridgeDamaged;
@@ -97,7 +97,6 @@ public class GameManager : MonoBehaviour {
 	private Stages _stage = Stages.GameNotStarted;
 	private Stages _lastStage = Stages.GameNotStarted;
 	private bool _canUpdateSkybox = false;
-	private bool _canUpdateReflectionProbes = false;
 	private bool _hasSwapedBridges = false;
 	private bool _canSwapBridges = false;
 	private float _skyboxLerpFactor = 0f;
@@ -107,6 +106,7 @@ public class GameManager : MonoBehaviour {
 	private int _scoreShadow = 0; // for handling stage changes
 	private int _bestScore = 0;
 	private int _coins = 0;
+	private int _lastStageIndex = 0;
 
 	public static void CallRepeating(Action action, ref float timer, float repeatRate) {
 		timer -= Time.deltaTime;
@@ -257,6 +257,7 @@ public class GameManager : MonoBehaviour {
 		else
 			ChangeQualityToHigh();
 
+		ChangeWaterReflectionsResolution(isCurrentlyLowGraphics);
 		OnChangedQuality?.Invoke();
 	}
 
@@ -378,45 +379,69 @@ public class GameManager : MonoBehaviour {
 		_lastStage = _stage;
 		_stage = newStage;
 
+		_lastStageIndex = (int)_lastStage - 1 <= 0 ? 0 : (int)_lastStage - 1;
+
 		Hitable.currentStage = _stage;
 		_obstacleSpawnManager.repeatRate = 3f;
 
-		_canUpdateSkybox = true;
+		if (_lastStage != Stages.GameNotStarted) {
+			_canUpdateSkybox = true;
+			HandleWater();
+		}
+	}
+
+	private void HandleWater() {
+		if (_lastStageIndex == 2)
+			_waters[0].SetActive(true);
+		else
+			_waters[_lastStageIndex+1].SetActive(true);
 	}
 
 	private void ResetSkybox() {
 		RenderSettings.skybox.SetColor("_Tint", _skyboxColors[0]);
-		UpdateReflectionProbes();
-		DynamicGI.UpdateEnvironment();
+
+		for (int i = 0; i < _waters.Count; i++) {
+			if (i == 0)
+				_waters[i].SetActive(true);
+			else
+				_waters[i].SetActive(false);
+
+			_waters[i].GetComponent<Renderer>()?.material.SetFloat("_Alpha", 1);
+		}
 	}
 
 	private void UpdateSkybox() {
-		int lastStage = (int)_lastStage - 1 <= 0 ? 0 : (int)_lastStage - 1;
+		int nextStageIndex = (int)_stage - 1;
+		int repeatWaterIndex = _lastStageIndex == 2 ? 0 : _lastStageIndex + 1;
+
 		if (_skyboxLerpFactor < _skyboxBlendDuration) {
 			_skyboxLerpFactor += Time.deltaTime;
-			RenderSettings.skybox.SetColor("_Tint", Color.Lerp(_skyboxColors[lastStage], _skyboxColors[(int)_stage - 1], _skyboxLerpFactor));
+			RenderSettings.skybox.SetColor("_Tint", Color.Lerp(_skyboxColors[_lastStageIndex], _skyboxColors[nextStageIndex], _skyboxLerpFactor));
 
-			if (_skyboxLerpFactor < _skyboxBlendDuration / 6 || _skyboxLerpFactor < _skyboxBlendDuration / 4 || _skyboxLerpFactor < _skyboxBlendDuration / 2)
-				_canUpdateReflectionProbes = true;
-
-			if (_canUpdateReflectionProbes) {
-				UpdateReflectionProbes();
-				_canUpdateReflectionProbes = false;
-			}
+				_waters[_lastStageIndex].GetComponent<Renderer>()?.material.SetFloat("_Alpha", Mathf.Lerp(1, 0, _skyboxLerpFactor));
+				_waters[repeatWaterIndex].GetComponent<Renderer>()?.material.SetFloat("_Alpha", Mathf.Lerp(0, 1, _skyboxLerpFactor));
 		}
 		else {
+			if (_waters[_lastStageIndex].GetComponent<Renderer>()?.material.GetFloat("_Alpha") <= 0)
+				_waters[_lastStageIndex].SetActive(false);
+
 			_canUpdateSkybox = false;
 			_skyboxLerpFactor = 0f;
-			UpdateReflectionProbes();
 		}
 	}
 
-	private void UpdateReflectionProbes() {
-		foreach (Transform waterChild in _waters.transform)
-			waterChild.GetComponent<ReflectionProbe>()?.RenderProbe();
+	private void ChangeWaterReflectionsResolution(bool isLowGraphics) {
+		foreach (GameObject water in _waters) {
+			if (isLowGraphics)
+				water.GetComponent<ReflectionProbe>().resolution = 16;
+			else
+				water.GetComponent<ReflectionProbe>().resolution = 64;
 
-		DynamicGI.UpdateEnvironment();
+			UpdateWaterReflectionProbe(water.GetComponent<ReflectionProbe>());
+		}
 	}
+
+	private void UpdateWaterReflectionProbe(ReflectionProbe probe) => probe.RenderProbe();
 
 	private void InitializeReset() {
 		ResetSkybox();
