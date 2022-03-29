@@ -24,6 +24,8 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _gameOverMenu;
 	[SerializeField] private GameObject _withNewBestScoreGroup;
 	[SerializeField] private GameObject _belowBestScoreGroup;
+	[SerializeField] private GameObject _firstLoseGroup;
+	[SerializeField] private GameObject _restartButton;
 	[SerializeField] private TMP_Text _finalScoreText;
 	[SerializeField] private TMP_Text _bestScoreText;
 
@@ -122,8 +124,21 @@ public class UIManager : MonoBehaviour {
 	}
 
 	private void OnGameOver(bool isThereNewBestScore) {
+		if (!DataManager.Instance.IsFirstLose)
+			ChangeFirstLoseVisibility();
+
 		SetMenusVisibility(false, false, true);
 		ShowScoreGroup(isThereNewBestScore);
+
+		DataManager.Instance.IsFirstLose = false;
+	}
+
+	private void ChangeFirstLoseVisibility() {
+		if (_firstLoseGroup != null)
+			_firstLoseGroup.SetActive(false);
+
+		if (_restartButton != null)
+			_restartButton.SetActive(true);
 	}
 
 	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
