@@ -441,7 +441,10 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	private void UpdateWaterReflectionProbe(ReflectionProbe probe) => probe.RenderProbe();
+	private void UpdateWaterReflectionProbe(ReflectionProbe probe) {
+		if (probe.isActiveAndEnabled)
+			probe.RenderProbe();
+	}
 
 	private void InitializeReset() {
 		ResetSkybox();
