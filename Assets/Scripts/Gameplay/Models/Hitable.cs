@@ -36,7 +36,7 @@ public abstract class Hitable : MonoBehaviour {
 	private void Start() => _rigidbody = GetComponent<Rigidbody>();
 
 	private void FixedUpdate() {
-		if (GameManager.Instance.IsGamePlayable) {
+		if (GameManager.Instance.isGameRunning) {
 			Vector3 direction = Vector3.left * (GameManager.Instance.playerSpeed + _customSpeedMultiplier) * Time.fixedDeltaTime;
 			Vector3 position = transform.position + direction;
 			_rigidbody.MovePosition(position);

@@ -26,18 +26,22 @@ public class GameManager : MonoBehaviour {
 	public static event Action<int> OnUpdateCoins;
 	public static event Action<int> OnUpdateFinalScore;
 	public static event Action OnChangedQuality;
+	public static event Action OnFinishedContinue;
+	public static event Action OnReplay;
 
 	public Stages CurrentStage { get { return _stage; } }
 	public int BestScore { get { return _bestScore; } }
 	public int Coins { get { return _coins; } }
 	public bool IsGamePlayable { get { return (isGameRunning && !isGamePaused); } }
 
-	public bool isGameRunning = false;
-	public bool isGamePaused = false;
-	public bool isCurrentlyLowGraphics = false;
-
 	[Header("Game Settings")]
 	[Space]
+	[Tooltip("If the game is running or not (correlates to the movement of the player and objects)")]
+	public bool isGameRunning = false;
+
+	[Tooltip("If the game is paused or not")]
+	public bool isGamePaused = false;
+
 	[Tooltip("The relative player speed, i.e. the speed of the objects coming towards the player")]
 	public float playerSpeed = 12.5f;
 
@@ -66,6 +70,15 @@ public class GameManager : MonoBehaviour {
 
 	[Header("Overall Settings")]
 	[Space]
+	[Tooltip("If the game settings is currently on low graphics or not")]
+	public bool isCurrentlyLowGraphics = false;
+
+	[Tooltip("If its the first lose of the player since openning of app or not")]
+	public bool isFirstLose = true;
+
+	[Tooltip("The chance of appearing the 2nd life button")]
+	public float continueChance = .2f;
+
 	[Tooltip("Amount of speed which the skybox will rotate")]
 	[SerializeField] private float _skyboxSpeed = .8f;
 
@@ -119,11 +132,13 @@ public class GameManager : MonoBehaviour {
 	private void OnEnable() {
 		PlayerController.OnReachedSwapPoint += SwapBridge;
 		OnUpdateScore += score => IncreaseShadowScore();
+		AdsManager.OnAdsFinished += Continue;
 	}
 
 	private void OnDisable() {
 		PlayerController.OnReachedSwapPoint -= SwapBridge;
 		OnUpdateScore -= score => IncreaseShadowScore();
+		AdsManager.OnAdsFinished -= Continue;
 	}
 
 	private void Awake() {
@@ -155,9 +170,9 @@ public class GameManager : MonoBehaviour {
 
 	private void Update() {
 		if (isGameRunning) {
+				RenderSettings.skybox.SetFloat("_Rotation", Time.time * _skyboxSpeed);
 			if (!isGamePaused) {
 				CallRepeating(IncreaseScore, ref _scoreTimer, _scoreRate);
-				RenderSettings.skybox.SetFloat("_Rotation", Time.time * _skyboxSpeed);
 
 				if (_canUpdateSkybox)
 					UpdateSkybox();
@@ -176,11 +191,18 @@ public class GameManager : MonoBehaviour {
 		AudioManager.Instance.PlaySound(Sound.Type.BGM1, 1);
 
 		isGameRunning = true;
-		isGamePaused = false;
 
 		OnPlay?.Invoke();
 
 		UnfreezeTime();
+	}
+
+	public void Replay() {
+		AudioManager.Instance.ResumeTrack(1);
+
+		isGamePaused = false;
+
+		OnReplay?.Invoke();
 	}
 
 	public void Pause() {
@@ -203,10 +225,10 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void GameOver(Sound.Type gameOverSound = Sound.Type.None) { // TODO: make every UI button function not work when !IsGamePlayable (cuz of fade)
-		AudioManager.Instance.PlaySoundOneShot(gameOverSound, 2);
-
 		if (!IsGamePlayable) // to avoid GameOver more than once
 			return;
+
+		AudioManager.Instance.PlaySoundOneShot(gameOverSound, 2);
 
 		isGameRunning = false;
 		isGamePaused = true;
@@ -216,14 +238,11 @@ public class GameManager : MonoBehaviour {
 
 		SaveSystem.Save(_bestScore, _coins);
 
-		AudioManager.Instance.StopAllTracks();
+		AudioManager.Instance.PauseAllTracks();
 	}
 
 	public void PlayAgain() {
-		isGameRunning = false;
-		isGamePaused = true;
 		UnfreezeTime();
-
 		StartCoroutine(ReloadSceneAfterTransition());
 	}
 
@@ -276,6 +295,12 @@ public class GameManager : MonoBehaviour {
 		Application.targetFrameRate = _targetFrameRate;
 	}
 
+	private void Continue() {
+		AudioManager.Instance.ResumeTrack(2);
+		isGameRunning = true;
+		StartCoroutine(TransitionedContinue()); // TODO: bad name
+	}
+
 	private IEnumerator ReloadSceneAfterTransition() {
 		_endTransitionAnimator.SetTrigger("Fade");
 		yield return new WaitForSeconds(_endTransitionDuration);
@@ -295,6 +320,11 @@ public class GameManager : MonoBehaviour {
 		OnResume?.Invoke();
 	}
 
+	private IEnumerator TransitionedContinue() {
+		yield return WaitScaleDownTransition(_gameOverAnimator);
+		OnFinishedContinue?.Invoke();
+	}
+
 	private IEnumerator WaitScaleUpTransition(Animator animator) {
 		animator.SetTrigger("ScaleUpBouncy");
 		yield return new WaitForSeconds(_scaleTransitionDuration);
@@ -304,7 +334,6 @@ public class GameManager : MonoBehaviour {
 		animator.SetTrigger("ScaleDown");
 		yield return new WaitForSeconds(_scaleTransitionDuration);
 	}
-
 
 	private void InitializeTrackVolumes() {
 		InitializeTrackVolume(1); // TODO: refactor

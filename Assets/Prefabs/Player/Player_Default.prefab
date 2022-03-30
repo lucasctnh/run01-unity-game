@@ -2092,6 +2092,7 @@ GameObject:
   - component: {fileID: 981752182999192}
   - component: {fileID: 981752182999195}
   - component: {fileID: 981752182999193}
+  - component: {fileID: 1418351255}
   m_Layer: 10
   m_Name: Player_Default
   m_TagString: Player
@@ -2188,13 +2189,25 @@ MonoBehaviour:
   _lowJumpMultiplier: 2
   _fallMultiplier: 4
   _teleportSpeed: 20
-  _ragdollHorizontalMultiplier: 2
-  _ragdollVerticalMultiplier: 2
   _idleAnimationRepeatRate: 5
   _camera: {fileID: 0}
   _swapBridgePoint: {fileID: 0}
   _rigidbody: {fileID: 981752182999192}
+  _animator: {fileID: 1828029650688333134}
   _renderer: {fileID: 1828029650692549518}
+--- !u!65 &1418351255
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828029650697824036}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.4, y: 0.4, z: 0.4}
+  m_Center: {x: 0, y: 0.2, z: 0.6}
 --- !u!1 &1828029650697824038
 GameObject:
   m_ObjectHideFlags: 0

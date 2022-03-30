@@ -9,6 +9,7 @@ using Random = UnityEngine.Random;
 public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	public static event Action OnInvertedPosition;
 	public static event Action OnReachedSwapPoint;
+	public static event Action OnShouldResetCamera;
 	public static bool IsGrounded { get; private set; }
 
 	[Header("Ground Settings")]
@@ -32,12 +33,6 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	[Tooltip("The speed multiplier for dissolving shader to complete")]
 	[SerializeField] private float _teleportSpeed = 15f;
 
-	[Tooltip("The horizontal force multiplier for throwing player at game over")]
-	[SerializeField] private float _ragdollHorizontalMultiplier = 1f;
-
-	[Tooltip("The vertical force multiplier for throwing player at game over")]
-	[SerializeField] private float _ragdollVerticalMultiplier = 2f;
-
 	[Header("Animation Settings")]
 	[Space]
 	[Tooltip("The amount in seconds to have a chance of a new idle animation pop up")]
@@ -48,20 +43,22 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	[SerializeField] private CameraController _camera;
 	[SerializeField] private Transform _swapBridgePoint;
 	[SerializeField] private Rigidbody _rigidbody;
+	[SerializeField] private Animator _animator;
 	[SerializeField] private Renderer _renderer;
 
 	private const float _GROUND_CHECK_RADIUS = .2f;
 
 	private List<Material> _materials = new List<Material>();
+	private Vector3 _initialPosition;
+	private Quaternion _initialRotation;
 	private bool _canTeleport = true;
 	private bool _canDissolveDown = false;
 	private bool _canDissolveUp = false;
+	private bool _isHoldingJump = false;
 	private float _airTime = 0f;
+	private float _idleAnimationsTimer = 0;
 	private int _gravityDirection = 1;
 	private int _jumps = 1;
-	private bool _isHoldingJump = false;
-	private float _idleAnimationsTimer = 0;
-	private bool _canRagdollPlayer = false;
 
 	private void OnEnable() {
 		InputsController.OnJump += Jump;
@@ -69,9 +66,11 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		InputsController.OnSwitch += VerifySwitch;
 		InputsController.OnButtonJump += ButtonJump;
 		InputsController.OnButtonSwitch += ButtonSwitch;
-		GameManager.OnPlay += OnPlay;
-		GameManager.OnGameOver += obj => _canRagdollPlayer = true;
+		GameManager.OnPlay += StartRun;
+		GameManager.OnGameOver += obj => PlayerDeath();
 		SkinsSystem.OnEndOfChangeSkin += AssignMaterials;
+		AdsManager.OnAdsFinished += ResetPlayerForReplay;
+		GameManager.OnReplay += OnReplay;
 	}
 
 	private void OnDisable() {
@@ -80,19 +79,23 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		InputsController.OnSwitch -= VerifySwitch;
 		InputsController.OnButtonJump -= ButtonJump;
 		InputsController.OnButtonSwitch -= ButtonSwitch;
-		GameManager.OnPlay -= OnPlay;
-		GameManager.OnGameOver -= obj => _canRagdollPlayer = true;
+		GameManager.OnPlay -= StartRun;
+		GameManager.OnGameOver -= obj => PlayerDeath();
 		SkinsSystem.OnEndOfChangeSkin -= AssignMaterials;
+		AdsManager.OnAdsFinished -= ResetPlayerForReplay;
+		GameManager.OnReplay -= OnReplay;
 	}
 
 	private void Awake() => AssignMaterials();
 
-	private void Start() => ResetPlayer();
+	private void Start() {
+		ResetGravity();
+
+		_initialPosition = transform.position;
+		_initialRotation = transform.rotation;
+	}
 
 	private void FixedUpdate() {
-		if (_canRagdollPlayer)
-			RagdollPlayer();
-
 		if (!GameManager.Instance.IsGamePlayable)
 			return;
 
@@ -122,25 +125,28 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 			GameManager.Instance.GameOver(Sound.Type.WaterDrip);
 	}
 
+	private void OnCollisionEnter(Collision other) {
+		if (other.gameObject.CompareTag("Lower Floor"))
+			_animator.SetTrigger("Fall");
+	}
+
 	public void ButtonJump() {
 		if (_jumps > 0 && GameManager.Instance.IsGamePlayable) {
 			_rigidbody.velocity = Vector3.up * _jumpForce * _gravityDirection;
 			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Jump, 2);
-			GetComponent<Animator>().SetBool("Jump", true);
+			_animator.SetBool("Jump", true);
 
 			_jumps--;
 		}
 	}
 
 	public void ButtonSwitch() {
-		if (IsGrounded && _canTeleport && GameManager.Instance.IsGamePlayable) {
+		if (IsGrounded && _canTeleport && GameManager.Instance.IsGamePlayable)
 			StartDissolving();
-			_gravityDirection *= -1;
-		}
 	}
 
 	public void RechargeJumps() {
-		GetComponent<Animator>().SetBool("Jump", false);
+		_animator.SetBool("Jump", false);
 		_jumps = 1;
 	}
 
@@ -188,7 +194,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		_canTeleport = true;
 	}
 
-	private void OnPlay() => GetComponent<Animator>().SetTrigger("Run");
+	private void StartRun() => _animator.SetTrigger("Run");
 
 	private void HandleGravity() {
 		if (_gravityDirection == 1) {
@@ -231,7 +237,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		if (_jumps > 0) {
 			_rigidbody.velocity = Vector3.up * _jumpForce * _gravityDirection;
 			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Jump, 2);
-			GetComponent<Animator>().SetBool("Jump", true);
+			_animator.SetBool("Jump", true);
 
 			_jumps--;
 		}
@@ -258,11 +264,16 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		transform.Rotate(new Vector3(0, 0, 180), Space.Self);
 		transform.position = new Vector3(transform.position.x, transform.position.y * -1, transform.position.z);
 
-		InvertGravity();
+		if (GameManager.Instance.IsGamePlayable)
+			InvertGravity();
+
 		RechargeJumps(); // Just in case cuz sometimes the onGround wont recharge
 	}
 
-	private void InvertGravity() => Physics.gravity *= -1;
+	private void InvertGravity() {
+		_gravityDirection *= -1;
+		Physics.gravity *= -1;
+	}
 
 	private void ResetGravity() {
 		if (Physics.gravity.y > 0)
@@ -276,35 +287,41 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		return false;
 	}
 
-	private void ResetPlayer() {
-		ResetRagdoll();
-		ResetGravity();
-	}
-
-	private void ResetRagdoll() {
-		if (_rigidbody != null)
-			_rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
-	}
-
-	private void RagdollPlayer() {
-		GetComponent<Animator>().SetTrigger("Die");
-
-		if (_rigidbody != null) {
-			_rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
-			_rigidbody.AddForce((Vector3.left * GameManager.Instance.playerSpeed * _ragdollHorizontalMultiplier) + (transform.up * _ragdollVerticalMultiplier),
-				ForceMode.VelocityChange);
-
-			ResetGravity();
-		}
-
-		_canRagdollPlayer = false;
-	}
-
 	private void HandleIdleAnimation() {
 		float idleEventMarking = Random.Range(0f, 1f);
 		if (idleEventMarking > 0f && idleEventMarking < 0.1)
-			GetComponent<Animator>().SetTrigger("IdleEvent1");
+			_animator.SetTrigger("IdleEvent1");
 		if (idleEventMarking > 0.9 && idleEventMarking < 1)
-			GetComponent<Animator>().SetTrigger("IdleEvent2");
+			_animator.SetTrigger("IdleEvent2");
+	}
+
+	private void PlayerDeath() {
+		if (_animator != null)
+			_animator.SetTrigger("Die");
+
+		ResetGravity();
+	}
+
+	private void ResetPlayerForReplay() {
+		_rigidbody.useGravity = false;
+		_rigidbody.velocity = Vector3.zero;
+		_rigidbody.detectCollisions = false;
+
+		_animator.SetTrigger("Fall");
+
+		OnShouldResetCamera?.Invoke();
+		ResetPositionAndRotation();
+		ResetGravity();
+	}
+
+	private void ResetPositionAndRotation() {
+		transform.position = new Vector3(_initialPosition.x, 5.59f, _initialPosition.z);
+		transform.rotation = _initialRotation;
+	}
+
+	private void OnReplay() {
+		StartRun();
+		_rigidbody.detectCollisions = true;
+		_rigidbody.useGravity = true;
 	}
 }

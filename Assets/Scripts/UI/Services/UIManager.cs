@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
+using Random = UnityEngine.Random;
 
 public class UIManager : MonoBehaviour {
 	public static event Action<bool> OnChangeSkin;
@@ -34,9 +35,9 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _gameUI;
 	[SerializeField] private TMP_Text _scoreText;
 	[SerializeField] private TMP_Text _coinsText;
+	[SerializeField] private GameObject _switch;
+	[SerializeField] private GameObject _jump;
 	[SerializeField] private Button _settingsButton;
-	[SerializeField] private Button _switchButton;
-	[SerializeField] private Button _jumpButton;
 
 	[Header("Pause Menu Screen")]
 	[Space]
@@ -44,6 +45,10 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private Slider _bgmSlider;
 	[SerializeField] private Slider _sfxSlider;
 	[SerializeField] private GameObject _lowGraphicsSign;
+
+	[Header("Continue Screen")]
+	[Space]
+	[SerializeField] private GameObject _continueMenu;
 
 	private bool _isPointerOnPauseMenu = false;
 
@@ -59,6 +64,9 @@ public class UIManager : MonoBehaviour {
 		GameManager.OnUpdateFinalScore += finalScore => UpdateFinalScore(finalScore);
 		GameManager.OnUpdateVolume += (track, volume) => UpdateVolumeSlider(track, volume);
 		GameManager.OnChangedQuality += SelectPauseMenu;
+		AdsManager.OnAdsFinished += OnAdsFinished;
+		GameManager.OnFinishedContinue += OnFinishedContinue;
+		GameManager.OnReplay += OnReplay;
 	}
 
 	private void OnDisable() {
@@ -73,6 +81,9 @@ public class UIManager : MonoBehaviour {
 		GameManager.OnUpdateFinalScore -= finalScore => UpdateFinalScore(finalScore);
 		GameManager.OnUpdateVolume -= (track, volume) => UpdateVolumeSlider(track, volume);
 		GameManager.OnChangedQuality -= SelectPauseMenu;
+		AdsManager.OnAdsFinished -= OnAdsFinished;
+		GameManager.OnFinishedContinue -= OnFinishedContinue;
+		GameManager.OnReplay -= OnReplay;
 	}
 
 	private void Start() => SetMenusVisibility(true, false, false);
@@ -119,26 +130,26 @@ public class UIManager : MonoBehaviour {
 		if (!GameManager.Instance.isGameRunning)
 			SetMenuVisibility(_initMenu, true);
 
-		SaveSystem.SaveSettings(AudioManager.Instance.GetTrackVolume(1), AudioManager.Instance.GetTrackVolume(2),
-			GameManager.Instance.isCurrentlyLowGraphics);
+		SaveSystem.SaveSettings(AudioManager.Instance.GetTrackVolume(1), AudioManager.Instance.GetTrackVolume(2), GameManager.Instance.isCurrentlyLowGraphics);
 	}
 
 	private void OnGameOver(bool isThereNewBestScore) {
-		if (!DataManager.Instance.IsFirstLose)
-			ChangeFirstLoseVisibility();
+		float willThereBeAContinue = Random.Range(0f, 1f);
+		if (GameManager.Instance.isFirstLose || willThereBeAContinue < GameManager.Instance.continueChance)
+			ShowContinueGroup();
 
 		SetMenusVisibility(false, false, true);
 		ShowScoreGroup(isThereNewBestScore);
 
-		DataManager.Instance.IsFirstLose = false;
+		GameManager.Instance.isFirstLose = false;
 	}
 
-	private void ChangeFirstLoseVisibility() {
-		if (_firstLoseGroup != null)
-			_firstLoseGroup.SetActive(false);
-
+	private void ShowContinueGroup() {
 		if (_restartButton != null)
-			_restartButton.SetActive(true);
+			_restartButton.SetActive(false);
+
+		if (_firstLoseGroup != null)
+			_firstLoseGroup.SetActive(true);
 	}
 
 	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
@@ -188,9 +199,30 @@ public class UIManager : MonoBehaviour {
 	private void HandleButtonsInteractibility(bool isPaused) {
 		_initSettingsButton.enabled = !isPaused;
 		_settingsButton.enabled = !isPaused;
-		_switchButton.enabled = !isPaused;
-		_jumpButton.enabled = !isPaused;
 		_arrowLeftButton.enabled = !isPaused;
 		_arrowRightButton.enabled = !isPaused;
+
+		if (_switch.GetComponent<Button>() != null)
+			_switch.GetComponent<Button>().enabled = !isPaused;
+		if (_jump.GetComponent<Button>() != null)
+			_jump.GetComponent<Button>().enabled = !isPaused;
+	}
+
+	private void OnAdsFinished() {
+		_switch.SetActive(false);
+		_jump.SetActive(false);
+
+		ChangeContinueMenuVisibility(true);
+	}
+
+	private void OnFinishedContinue() => SetMenuVisibility(_gameOverMenu, false);
+
+	private void ChangeContinueMenuVisibility(bool visibility) => _continueMenu.SetActive(visibility);
+
+	private void OnReplay() {
+		_switch.SetActive(true);
+		_jump.SetActive(true);
+
+		ChangeContinueMenuVisibility(false);
 	}
 }

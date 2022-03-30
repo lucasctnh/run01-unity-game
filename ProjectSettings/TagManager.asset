@@ -9,6 +9,7 @@ TagManager:
   - Hitable Destroyer
   - Collapse Destroyer
   - Water
+  - Lower Floor
   layers:
   - Default
   - TransparentFX

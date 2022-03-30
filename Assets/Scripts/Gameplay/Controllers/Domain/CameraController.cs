@@ -12,11 +12,17 @@ public class CameraController : MonoBehaviour {
 	private Vector3 _targetPosition = Vector3.zero;
 	private Vector3 _velocity = Vector3.zero;
 
-	private void OnEnable() => PlayerController.OnInvertedPosition += InvertCamera;
+	private void OnEnable() {
+		PlayerController.OnInvertedPosition += InvertCamera;
+		PlayerController.OnShouldResetCamera += ResetCamera;
+	}
 
-	private void OnDisable() => PlayerController.OnInvertedPosition -= InvertCamera;
+	private void OnDisable() {
+		PlayerController.OnInvertedPosition -= InvertCamera;
+		PlayerController.OnShouldResetCamera -= ResetCamera;
+	}
 
-	private void Start() => _targetPosition = _defaultPosition;
+	private void Start() => ResetTarget();
 
 	private void Update() {
 		if (GameManager.Instance.isGameRunning)
@@ -28,5 +34,12 @@ public class CameraController : MonoBehaviour {
 	private Vector3 InvertPosition() {
 		_targetPosition = new Vector3(_targetPosition.x, _targetPosition.y * -1, _targetPosition.z);
 		return _targetPosition;
+	}
+
+	private void ResetTarget() => _targetPosition = _defaultPosition;
+
+	private void ResetCamera() {
+		transform.position = _defaultPosition;
+		ResetTarget();
 	}
 }

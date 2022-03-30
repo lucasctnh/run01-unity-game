@@ -791,6 +791,7 @@ PlayerSettings:
   vrEditorSettings: {}
   cloudServicesEnabled:
     UNet: 1
+    Unity Ads: 0
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -804,11 +805,11 @@ PlayerSettings:
     m_VersionName: 
   apiCompatibilityLevel: 6
   activeInputHandler: 1
-  cloudProjectId: 
+  cloudProjectId: 667d2a21-00b4-4405-9177-b22ed2a7a1a8
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: 'Run01: Into Mayhem'
+  organizationId: coutlcdo
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 
