@@ -103,8 +103,10 @@ public class UIManager : MonoBehaviour {
 	public void PlayButtonClick() => AudioManager.Instance.PlaySoundOneShot(Sound.Type.UIClick, 2);
 
 	public void OnDeselectPauseMenu() {
-		if (!_isPointerOnPauseMenu)
+		if (!_isPointerOnPauseMenu) {
+			PlayButtonClick();
 			GameManager.Instance.Resume();
+		}
 	}
 
 	public void OnPointerEnterPauseMenu() => _isPointerOnPauseMenu = true;
