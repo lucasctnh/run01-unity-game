@@ -138,7 +138,9 @@ public class UIManager : MonoBehaviour {
 	private void OnGameOver(bool isThereNewBestScore) {
 		float willThereBeAContinue = Random.Range(0f, 1f);
 		if (GameManager.Instance.isFirstLose || willThereBeAContinue < GameManager.Instance.continueChance)
-			ShowContinueGroup();
+			ChangeContinueGroupVisibility(true);
+		else
+			ChangeContinueGroupVisibility(false);
 
 		SetMenusVisibility(false, false, true);
 		ShowScoreGroup(isThereNewBestScore);
@@ -146,12 +148,12 @@ public class UIManager : MonoBehaviour {
 		GameManager.Instance.isFirstLose = false;
 	}
 
-	private void ShowContinueGroup() {
+	private void ChangeContinueGroupVisibility(bool visibility) {
 		if (_restartButton != null)
-			_restartButton.SetActive(false);
+			_restartButton.SetActive(!visibility);
 
 		if (_continueGroup != null)
-			_continueGroup.SetActive(true);
+			_continueGroup.SetActive(visibility);
 	}
 
 	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {
