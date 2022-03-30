@@ -25,7 +25,7 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private GameObject _gameOverMenu;
 	[SerializeField] private GameObject _withNewBestScoreGroup;
 	[SerializeField] private GameObject _belowBestScoreGroup;
-	[SerializeField] private GameObject _firstLoseGroup;
+	[SerializeField] private GameObject _continueGroup;
 	[SerializeField] private GameObject _restartButton;
 	[SerializeField] private TMP_Text _finalScoreText;
 	[SerializeField] private TMP_Text _bestScoreText;
@@ -150,8 +150,8 @@ public class UIManager : MonoBehaviour {
 		if (_restartButton != null)
 			_restartButton.SetActive(false);
 
-		if (_firstLoseGroup != null)
-			_firstLoseGroup.SetActive(true);
+		if (_continueGroup != null)
+			_continueGroup.SetActive(true);
 	}
 
 	private void SetMenusVisibility(bool mainVisibility, bool pauseVisibility, bool gameOverVisibility) {

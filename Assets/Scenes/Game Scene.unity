@@ -11179,7 +11179,7 @@ MonoBehaviour:
   _gameOverMenu: {fileID: 24332071}
   _withNewBestScoreGroup: {fileID: 1825896001}
   _belowBestScoreGroup: {fileID: 296903911}
-  _firstLoseGroup: {fileID: 747870473}
+  _continueGroup: {fileID: 747870473}
   _restartButton: {fileID: 237008292}
   _finalScoreText: {fileID: 518997721}
   _bestScoreText: {fileID: 382466486}
@@ -11193,7 +11193,7 @@ MonoBehaviour:
   _bgmSlider: {fileID: 2098335737}
   _sfxSlider: {fileID: 1820219323}
   _lowGraphicsSign: {fileID: 1840877703}
-  _continueMenu: {fileID: 747870473}
+  _continueMenu: {fileID: 864673377}
 --- !u!114 &2077938534
 MonoBehaviour:
   m_ObjectHideFlags: 0
