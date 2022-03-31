@@ -64,9 +64,8 @@ public class UIManager : MonoBehaviour {
 		GameManager.OnUpdateFinalScore += finalScore => UpdateFinalScore(finalScore);
 		GameManager.OnUpdateVolume += (track, volume) => UpdateVolumeSlider(track, volume);
 		GameManager.OnChangedQuality += SelectPauseMenu;
-		AdsManager.OnAdsFinished += OnAdsFinished;
-		GameManager.OnFinishedContinue += OnFinishedContinue;
-		GameManager.OnReplay += OnReplay;
+		GameManager.OnPrepareContinue += () => ContinueHubVisibility(true, true);
+		GameManager.OnReplay += () => ContinueHubVisibility(false);
 	}
 
 	private void OnDisable() {
@@ -81,9 +80,8 @@ public class UIManager : MonoBehaviour {
 		GameManager.OnUpdateFinalScore -= finalScore => UpdateFinalScore(finalScore);
 		GameManager.OnUpdateVolume -= (track, volume) => UpdateVolumeSlider(track, volume);
 		GameManager.OnChangedQuality -= SelectPauseMenu;
-		AdsManager.OnAdsFinished -= OnAdsFinished;
-		GameManager.OnFinishedContinue -= OnFinishedContinue;
-		GameManager.OnReplay -= OnReplay;
+		GameManager.OnPrepareContinue -= () => ContinueHubVisibility(true, true);
+		GameManager.OnReplay -= () => ContinueHubVisibility(false);
 	}
 
 	private void Start() => SetMenusVisibility(true, false, false);
@@ -212,21 +210,15 @@ public class UIManager : MonoBehaviour {
 			_jump.GetComponent<Button>().enabled = !isPaused;
 	}
 
-	private void OnAdsFinished() {
-		_switch.SetActive(false);
-		_jump.SetActive(false);
+	private void ContinueHubVisibility(bool visibility, bool hideGameOverMenu = false) {
+		_switch.SetActive(!visibility);
+		_jump.SetActive(!visibility);
 
-		ChangeContinueMenuVisibility(true);
+		ChangeContinueMenuVisibility(visibility);
+
+		if (hideGameOverMenu)
+			SetMenuVisibility(_gameOverMenu, false);
 	}
-
-	private void OnFinishedContinue() => SetMenuVisibility(_gameOverMenu, false);
 
 	private void ChangeContinueMenuVisibility(bool visibility) => _continueMenu.SetActive(visibility);
-
-	private void OnReplay() {
-		_switch.SetActive(true);
-		_jump.SetActive(true);
-
-		ChangeContinueMenuVisibility(false);
-	}
 }

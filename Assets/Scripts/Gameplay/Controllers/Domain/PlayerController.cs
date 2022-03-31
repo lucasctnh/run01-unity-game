@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		GameManager.OnPlay += StartRun;
 		GameManager.OnGameOver += obj => PlayerDeath();
 		SkinsSystem.OnEndOfChangeSkin += AssignMaterials;
-		AdsManager.OnAdsFinished += ResetPlayerForReplay;
+		GameManager.OnPrepareContinue += ResetPlayerForReplay;
 		GameManager.OnReplay += OnReplay;
 	}
 
@@ -82,7 +82,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 		GameManager.OnPlay -= StartRun;
 		GameManager.OnGameOver -= obj => PlayerDeath();
 		SkinsSystem.OnEndOfChangeSkin -= AssignMaterials;
-		AdsManager.OnAdsFinished -= ResetPlayerForReplay;
+		GameManager.OnPrepareContinue -= ResetPlayerForReplay;
 		GameManager.OnReplay -= OnReplay;
 	}
 

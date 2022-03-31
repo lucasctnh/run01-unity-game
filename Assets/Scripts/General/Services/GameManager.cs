@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
 	public static event Action<int> OnUpdateCoins;
 	public static event Action<int> OnUpdateFinalScore;
 	public static event Action OnChangedQuality;
-	public static event Action OnFinishedContinue;
+	public static event Action OnPrepareContinue;
 	public static event Action OnReplay;
 
 	public Stages CurrentStage { get { return _stage; } }
@@ -265,9 +265,11 @@ public class GameManager : MonoBehaviour {
 
 	public void ChangeSFXVolume(float value) => OnUpdateVolume?.Invoke(2, value);
 
-	public void ChangeQuality() {
-		isCurrentlyLowGraphics = !isCurrentlyLowGraphics;
-		AssignQuality();
+	public void ChangeQuality() => StartCoroutine(ChangeAndAssignQuality());
+
+	public void PrepareContinue() {
+		OnPrepareContinue?.Invoke();
+		StartCoroutine(TransitionedContinue()); // TODO: bad name
 	}
 
 	private void AssignQuality() {
@@ -278,6 +280,24 @@ public class GameManager : MonoBehaviour {
 
 		ChangeWaterReflectionsResolution(isCurrentlyLowGraphics);
 		OnChangedQuality?.Invoke();
+	}
+
+	private IEnumerator ChangeAndAssignQuality() {
+		UnfreezeTime();
+		yield return FadeTransition("out");
+
+		isCurrentlyLowGraphics = !isCurrentlyLowGraphics;
+
+		if (isCurrentlyLowGraphics)
+			ChangeQualityToLow();
+		else
+			ChangeQualityToHigh();
+
+		ChangeWaterReflectionsResolution(isCurrentlyLowGraphics);
+		OnChangedQuality?.Invoke();
+
+		yield return FadeTransition("in");
+		FreezeTime();
 	}
 
 	private void ChangeQualityToLow() {
@@ -298,14 +318,22 @@ public class GameManager : MonoBehaviour {
 	private void Continue() {
 		AudioManager.Instance.ResumeTrack(2);
 		isGameRunning = true;
-		StartCoroutine(TransitionedContinue()); // TODO: bad name
 	}
 
-	private IEnumerator ReloadSceneAfterTransition() {
-		_endTransitionAnimator.SetTrigger("Fade");
+	private IEnumerator ReloadSceneAfterTransition() { // TODO: on UIManager?
+		_endTransitionAnimator.SetTrigger("FadeOut");
 		yield return new WaitForSeconds(_endTransitionDuration);
 
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	}
+
+	private IEnumerator FadeTransition(string fadeType) {
+		if (fadeType == "in")
+			_endTransitionAnimator.SetTrigger("FadeIn");
+		else if (fadeType == "out")
+			_endTransitionAnimator.SetTrigger("FadeOut");
+
+		yield return new WaitForSeconds(_endTransitionDuration);
 	}
 
 	private IEnumerator TransitionedPause() { // TODO: refactor (maybe TransitionedFunction and general transitions)
@@ -322,7 +350,6 @@ public class GameManager : MonoBehaviour {
 
 	private IEnumerator TransitionedContinue() {
 		yield return WaitScaleDownTransition(_gameOverAnimator);
-		OnFinishedContinue?.Invoke();
 	}
 
 	private IEnumerator WaitScaleUpTransition(Animator animator) {
