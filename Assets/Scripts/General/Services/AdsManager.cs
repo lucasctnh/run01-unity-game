@@ -7,7 +7,6 @@ using CandyCoded.env;
 
 public class AdsManager : MonoBehaviour, IUnityAdsListener {
 	public static AdsManager Instance;
-	public static event Action OnAdsFinished;
 
 	private string _gameId = "";
 
@@ -30,9 +29,11 @@ public class AdsManager : MonoBehaviour, IUnityAdsListener {
 	public void PlayAd() {
 		if (Advertisement.IsReady("Interstitial_Android"))
 			Advertisement.Show("Interstitial_Android");
+		else
+			GameManager.Instance.Continue();
 	}
 
-	public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) => OnAdsFinished?.Invoke();
+	public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) => GameManager.Instance.Continue();
 
 	public void OnUnityAdsDidError(string message) { }
 

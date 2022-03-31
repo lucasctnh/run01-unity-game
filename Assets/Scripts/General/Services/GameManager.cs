@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour {
 	public static event Action<int> OnUpdateFinalScore;
 	public static event Action OnChangedQuality;
 	public static event Action OnPrepareContinue;
+	public static event Action OnContinue;
 	public static event Action OnReplay;
 
 	public Stages CurrentStage { get { return _stage; } }
@@ -132,13 +133,11 @@ public class GameManager : MonoBehaviour {
 	private void OnEnable() {
 		PlayerController.OnReachedSwapPoint += SwapBridge;
 		OnUpdateScore += score => IncreaseShadowScore();
-		AdsManager.OnAdsFinished += Continue;
 	}
 
 	private void OnDisable() {
 		PlayerController.OnReachedSwapPoint -= SwapBridge;
 		OnUpdateScore -= score => IncreaseShadowScore();
-		AdsManager.OnAdsFinished -= Continue;
 	}
 
 	private void Awake() {
@@ -267,9 +266,20 @@ public class GameManager : MonoBehaviour {
 
 	public void ChangeQuality() => StartCoroutine(ChangeAndAssignQuality());
 
-	public void PrepareContinue() {
+	public void PrepareContinue() => StartCoroutine(PrepareContinueAfterFade());
+
+	public void Continue() => StartCoroutine(ContinueAfterFade());
+
+	private IEnumerator PrepareContinueAfterFade() {
+		yield return FadeTransition("out");
 		OnPrepareContinue?.Invoke();
-		StartCoroutine(TransitionedContinue()); // TODO: bad name
+	}
+
+	private IEnumerator ContinueAfterFade() {
+		AudioManager.Instance.ResumeTrack(2);
+		isGameRunning = true;
+		yield return FadeTransition("in");
+		yield return TransitionedContinue();
 	}
 
 	private void AssignQuality() {
@@ -315,11 +325,6 @@ public class GameManager : MonoBehaviour {
 		Application.targetFrameRate = _targetFrameRate;
 	}
 
-	private void Continue() {
-		AudioManager.Instance.ResumeTrack(2);
-		isGameRunning = true;
-	}
-
 	private IEnumerator ReloadSceneAfterTransition() { // TODO: on UIManager?
 		_endTransitionAnimator.SetTrigger("FadeOut");
 		yield return new WaitForSeconds(_endTransitionDuration);
@@ -350,6 +355,7 @@ public class GameManager : MonoBehaviour {
 
 	private IEnumerator TransitionedContinue() {
 		yield return WaitScaleDownTransition(_gameOverAnimator);
+		OnContinue?.Invoke();
 	}
 
 	private IEnumerator WaitScaleUpTransition(Animator animator) {

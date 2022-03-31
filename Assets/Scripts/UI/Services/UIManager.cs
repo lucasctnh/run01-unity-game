@@ -64,7 +64,8 @@ public class UIManager : MonoBehaviour {
 		GameManager.OnUpdateFinalScore += finalScore => UpdateFinalScore(finalScore);
 		GameManager.OnUpdateVolume += (track, volume) => UpdateVolumeSlider(track, volume);
 		GameManager.OnChangedQuality += SelectPauseMenu;
-		GameManager.OnPrepareContinue += () => ContinueHubVisibility(true, true);
+		GameManager.OnPrepareContinue += () => ContinueHubVisibility(true);
+		GameManager.OnContinue += HideGameOverMenu;
 		GameManager.OnReplay += () => ContinueHubVisibility(false);
 	}
 
@@ -80,7 +81,8 @@ public class UIManager : MonoBehaviour {
 		GameManager.OnUpdateFinalScore -= finalScore => UpdateFinalScore(finalScore);
 		GameManager.OnUpdateVolume -= (track, volume) => UpdateVolumeSlider(track, volume);
 		GameManager.OnChangedQuality -= SelectPauseMenu;
-		GameManager.OnPrepareContinue -= () => ContinueHubVisibility(true, true);
+		GameManager.OnPrepareContinue -= () => ContinueHubVisibility(true);
+		GameManager.OnContinue -= HideGameOverMenu;
 		GameManager.OnReplay -= () => ContinueHubVisibility(false);
 	}
 
@@ -210,15 +212,14 @@ public class UIManager : MonoBehaviour {
 			_jump.GetComponent<Button>().enabled = !isPaused;
 	}
 
-	private void ContinueHubVisibility(bool visibility, bool hideGameOverMenu = false) {
+	private void ContinueHubVisibility(bool visibility) {
 		_switch.SetActive(!visibility);
 		_jump.SetActive(!visibility);
 
 		ChangeContinueMenuVisibility(visibility);
-
-		if (hideGameOverMenu)
-			SetMenuVisibility(_gameOverMenu, false);
 	}
+
+	private void HideGameOverMenu() => SetMenuVisibility(_gameOverMenu, false);
 
 	private void ChangeContinueMenuVisibility(bool visibility) => _continueMenu.SetActive(visibility);
 }
