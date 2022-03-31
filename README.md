@@ -1,14 +1,16 @@
-# Run01: Into Mayhem - Unity Game
-![Game Gif]( "Game Gif")
+# Run01: Into Mayhem
 
-Open sourced under the [GNU GPLv3 license](https://github.com/lcscout/run01-unity-game/blob/main/LICENSE).
+Made with [Unity](https://unity.com/) & [C#](https://docs.microsoft.com/en-us/dotnet/csharp/).
 
-## What is it about
+## 🎉 Getting started
+This project requires [Unity3D](https://unity.com/) (2021.2+) to build and run. Clone this repository and open the root folder in Unity.
 
-## Play the game
+## 📣 Contributing
+Have a cool idea for Run01 that you want to put in the game? Found a bug, want to add a skin or change the game's behavior? Just open a [GitHub Issue](https://github.com/lcscout/run01-unity-game/issues) with your query.
 
-## Credits
-I've used some free assets in this projects, you can find them at the [Unity Asset Store](https://assetstore.unity.com/), in particular:
+## 📚 Libraries and Resources
 
-## Requirements
-This project requires [Unity3D](https://unity.com/) (2021.2+) to build and run. Clone this repository into a folder and open it in Unity.
+## 📜 Credits
+Created, designed, and developed by [Lucas Coutinho](https://coutinho.codes). Please give credit to this project if you use it elsewhere.
+
+Open sourced under the [GNU GPLv3](https://github.com/lcscout/run01-unity-game/blob/main/LICENSE) license ❤️.
