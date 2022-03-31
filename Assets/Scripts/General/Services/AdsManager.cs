@@ -28,14 +28,11 @@ public class AdsManager : MonoBehaviour, IUnityAdsListener {
 	}
 
 	public void PlayAd() {
-		if (Advertisement.IsReady("Rewarded_Android"))
-			Advertisement.Show("Rewarded_Android");
+		if (Advertisement.IsReady("Interstitial_Android"))
+			Advertisement.Show("Interstitial_Android");
 	}
 
-	public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) {
-		if (placementId == "Rewarded_Android" && showResult == ShowResult.Finished)
-			OnAdsFinished?.Invoke();
-	}
+	public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) => OnAdsFinished?.Invoke();
 
 	public void OnUnityAdsDidError(string message) { }
 
