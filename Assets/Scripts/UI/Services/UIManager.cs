@@ -127,10 +127,12 @@ public class UIManager : MonoBehaviour {
 	}
 
 	private void OnResume() {
-		SetMenusVisibility(false, false, false);
-
-		if (!GameManager.Instance.isGameRunning)
+		if (GameManager.Instance.isGamePaused) // Avoid OnResume showing InitMenu when its called after OnGameOver (cuz of coroutine)
+			SetMenuVisibility(_initMenu, false);
+		else if (!GameManager.Instance.isGameRunning) {
+			SetMenusVisibility(false, false, false);
 			SetMenuVisibility(_initMenu, true);
+		}
 
 		SaveSystem.SaveSettings(AudioManager.Instance.GetTrackVolume(1), AudioManager.Instance.GetTrackVolume(2), GameManager.Instance.isCurrentlyLowGraphics);
 	}

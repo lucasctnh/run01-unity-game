@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour {
 	[Header("Components References")]
 	[Space]
 	[SerializeField] private RenderPipelineAsset _lowGraphicsPipeline;
-	[SerializeField] private RenderPipelineAsset _highGraphicsPipeline;
+	[SerializeField] private RenderPipelineAsset _mediumGraphicsPipeline;
 	[SerializeField] private SpawnManager _obstacleSpawnManager;
 	[SerializeField] private List<GameObject> _waters = new List<GameObject>();
 	[SerializeField] private List<Color> _skyboxColors = new List<Color>();
@@ -286,14 +286,13 @@ public class GameManager : MonoBehaviour {
 		if (isCurrentlyLowGraphics)
 			ChangeQualityToLow();
 		else
-			ChangeQualityToHigh();
+			ChangeQualityToMedium();
 
 		ChangeWaterReflectionsResolution(isCurrentlyLowGraphics);
 		OnChangedQuality?.Invoke();
 	}
 
 	private IEnumerator ChangeAndAssignQuality() {
-		UnfreezeTime();
 		yield return FadeTransition("out");
 
 		isCurrentlyLowGraphics = !isCurrentlyLowGraphics;
@@ -301,13 +300,12 @@ public class GameManager : MonoBehaviour {
 		if (isCurrentlyLowGraphics)
 			ChangeQualityToLow();
 		else
-			ChangeQualityToHigh();
+			ChangeQualityToMedium();
 
 		ChangeWaterReflectionsResolution(isCurrentlyLowGraphics);
 		OnChangedQuality?.Invoke();
 
 		yield return FadeTransition("in");
-		FreezeTime();
 	}
 
 	private void ChangeQualityToLow() {
@@ -315,9 +313,9 @@ public class GameManager : MonoBehaviour {
 		QualitySettings.renderPipeline = _lowGraphicsPipeline;
 	}
 
-	private void ChangeQualityToHigh() {
-		QualitySettings.SetQualityLevel(3);
-		QualitySettings.renderPipeline = _highGraphicsPipeline;
+	private void ChangeQualityToMedium() {
+		QualitySettings.SetQualityLevel(2);
+		QualitySettings.renderPipeline = _mediumGraphicsPipeline;
 	}
 
 	private void LimitFrameRate() {
@@ -327,18 +325,20 @@ public class GameManager : MonoBehaviour {
 
 	private IEnumerator ReloadSceneAfterTransition() { // TODO: on UIManager?
 		_endTransitionAnimator.SetTrigger("FadeOut");
-		yield return new WaitForSeconds(_endTransitionDuration);
+		yield return new WaitForSecondsRealtime(_endTransitionDuration);
 
 		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 	}
 
 	private IEnumerator FadeTransition(string fadeType) {
-		if (fadeType == "in")
+		if (fadeType == "in") {
+			yield return null;
 			_endTransitionAnimator.SetTrigger("FadeIn");
+		}
 		else if (fadeType == "out")
 			_endTransitionAnimator.SetTrigger("FadeOut");
 
-		yield return new WaitForSeconds(_endTransitionDuration);
+		yield return new WaitForSecondsRealtime(_endTransitionDuration);
 	}
 
 	private IEnumerator TransitionedPause() { // TODO: refactor (maybe TransitionedFunction and general transitions)
@@ -504,7 +504,12 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void UpdateWaterReflectionProbe(ReflectionProbe probe) {
-		if (probe.isActiveAndEnabled)
+		if (!probe.isActiveAndEnabled) {
+			probe.gameObject.SetActive(true);
+			probe.RenderProbe();
+			probe.gameObject.SetActive(false);
+		}
+		else
 			probe.RenderProbe();
 	}
 
