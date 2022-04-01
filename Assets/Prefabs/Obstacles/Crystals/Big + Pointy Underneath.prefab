@@ -83,7 +83,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: fade0e2529f0a6f4fa5c5d57e9dda892, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 0.4
   Loop: 1
   Mute: 0
@@ -246,6 +246,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7647140136303449902, guid: a264e971ee1003042b544d28731811ad,
         type: 3}
+      propertyPath: m_Volume
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7647140136303449902, guid: a264e971ee1003042b544d28731811ad,
+        type: 3}
       propertyPath: DopplerLevel
       value: 2
       objectReference: {fileID: 0}
@@ -266,6 +271,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2663070111365304814}
     m_Modifications:
+    - target: {fileID: -3173154407193044981, guid: 9550b5398d9cd4e4b88d14c45e97d04b,
+        type: 3}
+      propertyPath: m_Volume
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -3173154407193044981, guid: 9550b5398d9cd4e4b88d14c45e97d04b,
         type: 3}
       propertyPath: DopplerLevel

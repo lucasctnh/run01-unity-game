@@ -10135,7 +10135,7 @@ MonoBehaviour:
   _remakeStageThreshold: 120
   isCurrentlyLowGraphics: 0
   isFirstLose: 1
-  continueChance: 0.25
+  continueChance: 0.3
   _skyboxSpeed: 0.8
   _skyboxBlendDuration: 2
   _endTransitionDuration: 1

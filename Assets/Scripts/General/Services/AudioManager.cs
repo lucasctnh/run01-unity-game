@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -75,6 +76,15 @@ public class AudioManager : MonoBehaviour {
 		AudioSource audioSource = GetTrack(trackNumber);
 		if (audioSource != null)
 			audioSource.PlayOneShot(GetAudioClip(soundType));
+	}
+
+	public IEnumerator WaitPlaySoundOneShot(Sound.Type soundType, int trackNumber, Action action) {
+		AudioSource audioSource = GetTrack(trackNumber);
+		if (audioSource != null)
+			audioSource.PlayOneShot(GetAudioClip(soundType));
+
+		yield return new WaitWhile(() => audioSource.isPlaying);
+		action();
 	}
 
 	public float GetTrackVolume(int trackNumber) {

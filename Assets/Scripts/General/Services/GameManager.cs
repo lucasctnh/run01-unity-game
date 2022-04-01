@@ -236,8 +236,6 @@ public class GameManager : MonoBehaviour {
 		OnUpdateFinalScore?.Invoke(_score);
 
 		SaveSystem.Save(_bestScore, _coins);
-
-		AudioManager.Instance.PauseAllTracks();
 	}
 
 	public void PlayAgain() {

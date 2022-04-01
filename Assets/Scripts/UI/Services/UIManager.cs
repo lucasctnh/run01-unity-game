@@ -129,10 +129,10 @@ public class UIManager : MonoBehaviour {
 	private void OnResume() {
 		if (GameManager.Instance.isGamePaused) // Avoid OnResume showing InitMenu when its called after OnGameOver (cuz of coroutine)
 			SetMenuVisibility(_initMenu, false);
-		else if (!GameManager.Instance.isGameRunning) {
-			SetMenusVisibility(false, false, false);
+		else if (!GameManager.Instance.isGameRunning)
 			SetMenuVisibility(_initMenu, true);
-		}
+
+		SetMenuVisibility(_pauseMenu, false);
 
 		SaveSystem.SaveSettings(AudioManager.Instance.GetTrackVolume(1), AudioManager.Instance.GetTrackVolume(2), GameManager.Instance.isCurrentlyLowGraphics);
 	}
@@ -148,6 +148,8 @@ public class UIManager : MonoBehaviour {
 		ShowScoreGroup(isThereNewBestScore);
 
 		GameManager.Instance.isFirstLose = false;
+
+		AudioManager.Instance.PauseAllTracks();
 	}
 
 	private void ChangeContinueGroupVisibility(bool visibility) {
@@ -215,13 +217,18 @@ public class UIManager : MonoBehaviour {
 	}
 
 	private void ContinueHubVisibility(bool visibility) {
-		_switch.SetActive(!visibility);
-		_jump.SetActive(!visibility);
+		if (_switch != null)
+			_switch.SetActive(!visibility);
+		if (_jump != null)
+			_jump.SetActive(!visibility);
 
 		ChangeContinueMenuVisibility(visibility);
 	}
 
 	private void HideGameOverMenu() => SetMenuVisibility(_gameOverMenu, false);
 
-	private void ChangeContinueMenuVisibility(bool visibility) => _continueMenu.SetActive(visibility);
+	private void ChangeContinueMenuVisibility(bool visibility) {
+		if (_continueMenu != null)
+			_continueMenu.SetActive(visibility);
+	}
 }

@@ -33,6 +33,12 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	[Tooltip("The speed multiplier for dissolving shader to complete")]
 	[SerializeField] private float _teleportSpeed = 15f;
 
+	[Tooltip("The throw back force to be applied horizontally when player dies")]
+	[SerializeField] private float _rigibodyThrowbackForceLeft = 2000f;
+
+	[Tooltip("The throw back force to be applied vertically when player dies")]
+	[SerializeField] private float _rigibodyThrowbackForceUp = 500f;
+
 	[Header("Animation Settings")]
 	[Space]
 	[Tooltip("The amount in seconds to have a chance of a new idle animation pop up")]
@@ -89,7 +95,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 	private void Awake() => AssignMaterials();
 
 	private void Start() {
-		ResetGravity();
+		ResetPlayer();
 
 		_initialPosition = transform.position;
 		_initialRotation = transform.rotation;
@@ -295,11 +301,35 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 			_animator.SetTrigger("IdleEvent2");
 	}
 
+	private void ResetPlayer() {
+		ResetConstraint();
+		ResetGravity();
+	}
+
 	private void PlayerDeath() {
 		if (_animator != null)
 			_animator.SetTrigger("Die");
 
 		ResetGravity();
+		ThrowPlayerBackwards();
+	}
+
+	private void ThrowPlayerBackwards() {
+		DeconstraintPlayer();
+
+		if (_rigidbody != null)
+			_rigidbody.AddForce(Vector3.left * _rigibodyThrowbackForceLeft * Time.fixedDeltaTime +
+				transform.up * _rigibodyThrowbackForceUp * Time.fixedDeltaTime, ForceMode.VelocityChange);
+	}
+
+	private void DeconstraintPlayer() {
+		if (_rigidbody != null)
+			_rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+	}
+
+	private void ResetConstraint() {
+		if (_rigidbody != null)
+			_rigidbody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
 	}
 
 	private void ResetPlayerForReplay() {
@@ -311,6 +341,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
 
 		OnShouldResetCamera?.Invoke();
 		ResetPositionAndRotation();
+		ResetConstraint();
 		ResetGravity();
 	}
 
