@@ -1,4 +1,8 @@
-# Run01: Into Mayhem
+# Run01: Until Mayhem
+
+**Run01** is a side-scrolling endless runner game for mobile where you're helping a mutant experiment with its task. The game is similar to [Chrome's Dino Game](https://en.wikipedia.org/wiki/Dinosaur_Game), with a twist on having two runnable planes and being able to teleport between them. Collect the dark stones and keep running, until mayhem.
+
+If you'd like to know more about the project and the development process, check it's [page on my website](https://coutinho.codes).
 
 Made with [Unity](https://unity.com/) & [C#](https://docs.microsoft.com/en-us/dotnet/csharp/).
 
@@ -19,6 +23,4 @@ Have a cool idea for **Run01** that you want to put in the game? Found a bug, wa
 8. [Biomechanical Mutant (Unity Asset)](https://assetstore.unity.com/packages/3d/characters/humanoids/sci-fi/free-biomechanical-mutant-166330)
 
 ## 📜 Credits
-Created, designed, and developed by [Lucas Coutinho](https://coutinho.codes). Please give credit to this project if you use it elsewhere.
-
-Open sourced under the [GNU GPLv3](https://github.com/lcscout/run01-unity-game/blob/main/LICENSE) license ❤️.
+Created, designed, and developed by [Lucas Coutinho](https://coutinho.codes). Please give credit to this project if you use it elsewhere. Open sourced under the [GNU GPLv3](https://github.com/lcscout/run01-unity-game/blob/main/LICENSE) license ❤️.
