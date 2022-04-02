@@ -2,7 +2,7 @@
 
 **Run01** is a side-scrolling endless runner game for mobile where you're helping a mutant experiment with its task. The game is similar to [Chrome's Dino Game](https://en.wikipedia.org/wiki/Dinosaur_Game), with a twist on having two runnable planes and being able to teleport between them. Collect the dark stones and keep running, until mayhem.
 
-If you'd like to know more about the project and the development process, check it's [page on my website](https://coutinho.codes).
+If you'd like to know more about the project and the development process, check it's [page on my website](https://coutinho.codes/portfolio/gamedev/run01).
 
 Made with [Unity](https://unity.com/) & [C#](https://docs.microsoft.com/en-us/dotnet/csharp/).
 
