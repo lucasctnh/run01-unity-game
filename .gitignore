@@ -71,8 +71,8 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-# Keystore key
-user.keystore
+# Keystore keys
+/[Kk]eystore/
 
 # Environment Variables
 *.env
