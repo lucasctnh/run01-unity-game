@@ -1,4 +1,6 @@
-# Run01: 'til Mayhem
+<p align="center">
+  <a href="https://coutinho.codes/portfolio/gamedev/run01"><img alt="Game Logo: It's written Run01: 'til Mayhem but the '0' is the face of the player character" src='Assets/UI/game_logo_2.png' style="width: 700px;"/></a>
+</p>
 
 **Run01** is a side-scrolling endless runner game for mobile where you're helping a mutant experiment with its task. The game is similar to [Chrome's Dino Game](https://en.wikipedia.org/wiki/Dinosaur_Game), with a twist on having two runnable planes and being able to teleport between them. Collect the dark stones and keep running, until mayhem.
 
