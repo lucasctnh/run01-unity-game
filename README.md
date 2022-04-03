@@ -1,10 +1,10 @@
 <p align="center">
-  <a href="https://coutinho.codes/portfolio/gamedev/run01" target="_blank"><img alt="Game Logo: It's written Run01: 'til Mayhem but the '0' is the face of the player character" src='Assets/UI/game_logo_2.png' style="width: 700px;"/></a>
+  <a href="https://coutinho.codes/portfolio/gamedev/run01" target="_blank"><img alt="Game Logo: It's written Run01: 'til Mayhem but the '0' is the face of the player character" src='Assets/UI/game_logo_2.png' style="width: 500px;"/></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/checks-status/lcscout/run01-unity-game/main">
-  <img src="https://img.shields.io/maintenance/yes/2022">
+  <a href="https://github.com/lcscout"><img src="https://img.shields.io/maintenance/yes/2022"></a>
+  <a href="https://github.com/lcscout/run01-unity-game/releases"><img src="https://badgen.net/github/release/lcscout/run01-unity-game"></a>
   <a href="https://github.com/lcscout/run01-unity-game/releases"><img src="https://img.shields.io/github/downloads/lcscout/run01-unity-game/total"></a>
 </p>
 
