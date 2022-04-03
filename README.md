@@ -1,4 +1,4 @@
-# Run01: Until Mayhem
+# Run01: 'til Mayhem
 
 **Run01** is a side-scrolling endless runner game for mobile where you're helping a mutant experiment with its task. The game is similar to [Chrome's Dino Game](https://en.wikipedia.org/wiki/Dinosaur_Game), with a twist on having two runnable planes and being able to teleport between them. Collect the dark stones and keep running, until mayhem.
 
