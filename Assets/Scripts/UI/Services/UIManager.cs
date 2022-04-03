@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour {
 	[SerializeField] private Button _playButton;
 	[SerializeField] private Button _arrowLeftButton;
 	[SerializeField] private Button _arrowRightButton;
+	[SerializeField] private Button _unlockButton;
 
 	[Header("Game-Over Screen")]
 	[Space]
@@ -89,7 +90,7 @@ public class UIManager : MonoBehaviour {
 	private void Start() => SetMenusVisibility(true, false, false);
 
 	private void Update() {
-		_playButton.enabled = SkinsSystem.isCurrentSkinUnlocked;
+		_playButton.interactable = SkinsSystem.isCurrentSkinUnlocked;
 		HandleButtonsInteractibility(GameManager.Instance.isGamePaused);
 
 		_gameUI.SetActive(GameManager.Instance.isGameRunning);
@@ -184,16 +185,16 @@ public class UIManager : MonoBehaviour {
 	}
 
 	private void UpdateCoins(int coins) {
-		_initCoinsText.text = "x " + coins;
-		_coinsText.text = "x " + coins;
+		_initCoinsText.text = coins.ToString();
+		_coinsText.text = coins.ToString();
 	}
 
 	private void UpdateBestScore(int bestScore) {
-		_initBestScoreText.text = "Best: " + bestScore;
-		_bestScoreText.text = "Best: " + bestScore;
+		_initBestScoreText.text = bestScore.ToString();
+		_bestScoreText.text = "Your best is: " + bestScore;
 	}
 
-	private void UpdateScore(int score) => _scoreText.text = "Score: " + score;
+	private void UpdateScore(int score) => _scoreText.text = score.ToString();
 
 	private void UpdateFinalScore(int finalScore) => _finalScoreText.text = "You did: " + finalScore;
 
@@ -205,15 +206,15 @@ public class UIManager : MonoBehaviour {
 	}
 
 	private void HandleButtonsInteractibility(bool isPaused) {
-		_initSettingsButton.enabled = !isPaused;
-		_settingsButton.enabled = !isPaused;
-		_arrowLeftButton.enabled = !isPaused;
-		_arrowRightButton.enabled = !isPaused;
+		_initSettingsButton.interactable = !isPaused;
+		_arrowLeftButton.interactable = !isPaused;
+		_arrowRightButton.interactable = !isPaused;
+		_unlockButton.interactable = !isPaused;
 
 		if (_switch.GetComponent<Button>() != null)
-			_switch.GetComponent<Button>().enabled = !isPaused;
+			_switch.GetComponent<Button>().interactable = !isPaused;
 		if (_jump.GetComponent<Button>() != null)
-			_jump.GetComponent<Button>().enabled = !isPaused;
+			_jump.GetComponent<Button>().interactable = !isPaused;
 	}
 
 	private void ContinueHubVisibility(bool visibility) {
