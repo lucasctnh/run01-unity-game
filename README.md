@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://coutinho.codes/portfolio/gamedev/run01" target="_blank"><img alt="Game Logo: It's written Run01: 'til Mayhem but the '0' is the face of the player character" src='Assets/UI/game_logo_2.png' style="width: 500px;"/></a>
+  <a href="https://coutinho.codes/portfolio/gamedev/run01" target="_blank"><img alt="Game Logo: It's written Run01: 'til Mayhem but the '0' is the face of the player character" src='r01-logo.png' style="width: 500px;"/></a>
 </p>
 
 <p align="center">
@@ -8,7 +8,15 @@
   <a href="https://github.com/lcscout/run01-unity-game/releases"><img src="https://img.shields.io/github/downloads/lcscout/run01-unity-game/total"></a>
 </p>
 
+<br>
+
 **Run01** is a side-scrolling endless runner game for mobile where you're helping a mutant experiment with its task. The game is similar to [Chrome's Dino Game](https://en.wikipedia.org/wiki/Dinosaur_Game), with a twist on having two runnable planes and being able to teleport between them. Collect the dark stones and keep running, until mayhem.
+
+<br>
+
+<p align="center">
+  <a href="https://coutinho.codes/portfolio/gamedev/run01" target="_blank"><img alt="Game gif showing the initial screen and the gameplay, which is the mutant (humanoid) running and avoid obstacles such as cars and crystals" src='r01-Gif.gif'/></a>
+</p>
 
 If you'd like to know more about the project and the development process, check it's [page on my website](https://coutinho.codes/portfolio/gamedev/run01).
 
