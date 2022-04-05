@@ -20,7 +20,7 @@ public class Collectable : Hitable {
 
 	public override Vector3 GenerateRandomPosition(float horizontalPosition) {
 		float posY = Random.Range(_posYMinMax.x, _posYMinMax.y);
-		while (posY < 2 && posY > -2) // exclude bridge position
+		while (posY < 2 && posY > -2) // exclude bridge thickness
 			posY = Random.Range(_posYMinMax.x, _posYMinMax.y);
 
 		return new Vector3(horizontalPosition, posY, transform.position.z);
