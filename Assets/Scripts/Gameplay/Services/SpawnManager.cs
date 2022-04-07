@@ -47,7 +47,7 @@ public class SpawnManager : MonoBehaviour {
 
 	private void OnReleaseHitableToPool(Hitable hitable) {
 		hitable.isReleased = true;
-		hitable.transform.position = GenerateRandomPosition(hitable); // TODO: check if this is causing physics spike
+		hitable.transform.position = GenerateRandomPosition(hitable);
 		hitable.gameObject.SetActive(false);
 	}
 
@@ -57,19 +57,24 @@ public class SpawnManager : MonoBehaviour {
 			Hitable hitable = pool.Get();
 			hitable.GetComponent<Hitable>().SetKill(hitable => Kill(pool, hitable));
 
-			AudioSource[] audioSources = hitable.GetComponents<AudioSource>(); // TODO: abstract
-			if (audioSources != null && audioSources.Length != 0) {
-				foreach (AudioSource audioSource in audioSources) {
-					float obstacleVolume = AudioManager.Instance.GetTrackVolume(2) == 0 ? 0 : AudioManager.Instance.GetTrackVolume(2) + .2f;
-					audioSource.volume = obstacleVolume;
-				}
-			}
+			SetHitableVolume(hitable);
 
 			if (!CheckShouldSpawn(hitable))
 				pool.Release(hitable);
 		}
 
 		_isSelectingPool = true;
+	}
+
+	private void SetHitableVolume(Hitable hitable) {
+		AudioSource[] audioSources = hitable.GetComponents<AudioSource>();
+
+		if (audioSources != null && audioSources.Length != 0) {
+			foreach (AudioSource audioSource in audioSources) {
+				float obstacleVolume = AudioManager.Instance.GetTrackVolume(2) == 0 ? 0 : AudioManager.Instance.GetTrackVolume(2) + .2f;
+				audioSource.volume = obstacleVolume;
+			}
+		}
 	}
 
 	private bool CheckShouldSpawn(Hitable hitable) {
