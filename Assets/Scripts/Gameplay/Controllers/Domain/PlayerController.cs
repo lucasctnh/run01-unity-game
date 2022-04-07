@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 
-public class PlayerController : MonoBehaviour { // TODO: refactor this ugly mess
+public class PlayerController : MonoBehaviour { // TODO: refactor
 	public static event Action OnInvertedPosition;
 	public static event Action OnReachedSwapPoint;
 	public static event Action OnShouldResetCamera;

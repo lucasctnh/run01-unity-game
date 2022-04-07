@@ -223,7 +223,7 @@ public class GameManager : MonoBehaviour {
 		StartCoroutine(TransitionedResume());
 	}
 
-	public void GameOver(Sound.Type gameOverSound = Sound.Type.None) { // TODO: make every UI button function not work when !IsGamePlayable (cuz of fade)
+	public void GameOver(Sound.Type gameOverSound = Sound.Type.None) {
 		AudioManager.Instance.PlaySoundOneShot(gameOverSound, 2);
 
 		if (!IsGamePlayable) // to avoid GameOver more than once
@@ -256,7 +256,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void ChangeBGMVolume(float value) {
-		OnUpdateVolume?.Invoke(1, value); // TODO: refactor
+		OnUpdateVolume?.Invoke(1, value);
 		OnUpdateVolume?.Invoke(3, value);
 	}
 
@@ -367,7 +367,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void InitializeTrackVolumes() {
-		InitializeTrackVolume(1); // TODO: refactor
+		InitializeTrackVolume(1);
 		InitializeTrackVolume(2);
 		InitializeTrackVolume(3);
 	}
@@ -385,7 +385,7 @@ public class GameManager : MonoBehaviour {
 		isCurrentlyLowGraphics = data.isLowGraphics;
 		AssignQuality();
 
-		OnUpdateVolume?.Invoke(1, data.bgmVolume); // TODO: refactor
+		OnUpdateVolume?.Invoke(1, data.bgmVolume);
 		OnUpdateVolume?.Invoke(2, data.sfxVolume);
 		OnUpdateVolume?.Invoke(3, data.bgmVolume);
 	}
