@@ -123,7 +123,7 @@ public class UIManager : MonoBehaviour {
 
 		SetMenusVisibility(false, true, false);
 
-		if (!GameManager.Instance.isGameRunning) // TODO: refactor (abstract)
+		if (!GameManager.Instance.isGameRunning)
 			SetMenuVisibility(_initMenu, true);
 	}
 
