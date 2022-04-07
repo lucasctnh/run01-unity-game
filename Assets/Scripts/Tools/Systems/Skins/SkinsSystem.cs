@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class SkinsSystem : MonoBehaviour { // TODO: refactorate
+public class SkinsSystem : MonoBehaviour {
 	public static event Action OnEndOfChangeSkin;
 	public static bool isCurrentSkinUnlocked = true;
 
