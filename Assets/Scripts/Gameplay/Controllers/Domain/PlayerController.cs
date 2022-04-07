@@ -68,10 +68,8 @@ public class PlayerController : MonoBehaviour { // TODO: refactor
 
 	private void OnEnable() {
 		InputsController.OnJump += Jump;
+		InputsController.OnSwitch += Switch;
 		InputsController.OnHoldingJump += isHoldingJump => AssignHoldingJump(isHoldingJump);
-		InputsController.OnSwitch += VerifySwitch;
-		InputsController.OnButtonJump += ButtonJump;
-		InputsController.OnButtonSwitch += ButtonSwitch;
 		GameManager.OnPlay += StartRun;
 		GameManager.OnGameOver += obj => PlayerDeath();
 		SkinsSystem.OnEndOfChangeSkin += AssignMaterials;
@@ -81,10 +79,8 @@ public class PlayerController : MonoBehaviour { // TODO: refactor
 
 	private void OnDisable() {
 		InputsController.OnJump -= Jump;
+		InputsController.OnSwitch -= Switch;
 		InputsController.OnHoldingJump -= isHoldingJump => AssignHoldingJump(isHoldingJump);
-		InputsController.OnSwitch -= VerifySwitch;
-		InputsController.OnButtonJump -= ButtonJump;
-		InputsController.OnButtonSwitch -= ButtonSwitch;
 		GameManager.OnPlay -= StartRun;
 		GameManager.OnGameOver -= obj => PlayerDeath();
 		SkinsSystem.OnEndOfChangeSkin -= AssignMaterials;
@@ -136,7 +132,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor
 			_animator.SetTrigger("Fall");
 	}
 
-	public void ButtonJump() {
+	public void Jump() {
 		if (_jumps > 0 && GameManager.Instance.IsGamePlayable) {
 			_rigidbody.velocity = Vector3.up * _jumpForce * _gravityDirection;
 			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Jump, 2);
@@ -146,7 +142,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor
 		}
 	}
 
-	public void ButtonSwitch() {
+	public void Switch() {
 		if (IsGrounded && _canTeleport && GameManager.Instance.IsGamePlayable)
 			StartDissolving();
 	}
@@ -239,27 +235,7 @@ public class PlayerController : MonoBehaviour { // TODO: refactor
 			_airTime += Time.deltaTime;
 	}
 
-	private void Jump() {
-		if (_jumps > 0) {
-			_rigidbody.velocity = Vector3.up * _jumpForce * _gravityDirection;
-			AudioManager.Instance.PlaySoundOneShot(Sound.Type.Jump, 2);
-			_animator.SetBool("Jump", true);
-
-			_jumps--;
-		}
-	}
-
 	private void AssignHoldingJump(bool isHoldingJump) => _isHoldingJump = isHoldingJump;
-
-	private void VerifySwitch(float yDrag) {
-		int newGravityDirection = (yDrag > 0) ? 1 : -1;
-		if (_gravityDirection != newGravityDirection && IsGrounded && _canTeleport) {
-			StartDissolving();
-			AssignNewGravityDirection(newGravityDirection);
-		}
-	}
-
-	private void AssignNewGravityDirection(int newGravityDirection) => _gravityDirection = newGravityDirection;
 
 	private void StartDissolving() => _canDissolveDown = true;
 
