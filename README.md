@@ -22,11 +22,14 @@ If you'd like to know more about the project and the development process, check 
 
 Made with [Unity](https://unity.com/) & [C#](https://docs.microsoft.com/en-us/dotnet/csharp/).
 
-## 🎉 Getting started
-This project requires [Unity3D](https://unity.com/) (2021.2+) to build and run. Clone this repository and open the root folder in Unity.
+## 📥 Download
+Get the latest release [here](https://github.com/lcscout/run01-unity-game/releases). Currently, the game is only available through APK.
 
 ## 📣 Contributing
 Have a cool idea for **Run01** that you want to put in the game? Found a bug, want to add a skin or change the game's behavior? Just open a [GitHub Issue](https://github.com/lcscout/run01-unity-game/issues) with your query.
+
+## 🎉 Getting Started
+To build and run this project you'll need [Unity3D](https://unity.com/) (2021.2+). Clone this repository and open the root folder in Unity.
 
 ## 📚 Libraries and Resources
 1. [CandyCoded - env (GitHub)](https://github.com/CandyCoded/env)
