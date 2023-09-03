@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://coutinho.codes/portfolio/gamedev/run01" target="_blank"><img alt="Game Logo: It's written Run01: 'til Mayhem but the '0' is the face of the player character" src='r01-logo.png' style="width: 500px;"/></a>
+  <a href="https://lucascoutinho.me/projects/run01" target="_blank"><img alt="Game Logo: It's written Run01: 'til Mayhem but the '0' is the face of the player character" src='r01-logo.png' style="width: 500px;"/></a>
 </p>
 
 <p align="center">
@@ -15,10 +15,10 @@
 <br>
 
 <p align="center">
-  <a href="https://coutinho.codes/portfolio/gamedev/run01" target="_blank"><img alt="Game gif showing the initial screen and the gameplay, which is the mutant (humanoid) running and avoid obstacles such as cars and crystals" src='r01-Gif.gif'/></a>
+  <a href="https://lucascoutinho.me/projects/run01" target="_blank"><img alt="Game gif showing the initial screen and the gameplay, which is the mutant (humanoid) running and avoid obstacles such as cars and crystals" src='r01-Gif.gif'/></a>
 </p>
 
-If you'd like to know more about the project and the development process, check it's [page on my website](https://coutinho.codes/portfolio/gamedev/run01).
+If you'd like to know more about the project and the development process, check it's [page on my website](https://lucascoutinho.me/projects/run01).
 
 Made with [Unity](https://unity.com/) & [C#](https://docs.microsoft.com/en-us/dotnet/csharp/).
 
@@ -42,4 +42,4 @@ To build and run this project you'll need [Unity3D](https://unity.com/) (2021.2+
 8. [Biomechanical Mutant (Unity Asset)](https://assetstore.unity.com/packages/3d/characters/humanoids/sci-fi/free-biomechanical-mutant-166330)
 
 ## 📜 Credits
-Created, designed, and developed by [Lucas Coutinho](https://coutinho.codes). Please give credit to this project if you use it elsewhere. Open sourced under the [GNU GPLv3](https://github.com/lcscout/run01-unity-game/blob/main/LICENSE) license ❤️.
+Created, designed, and developed by [Lucas Coutinho](https://lucascoutinho.me). Please give credit to this project if you use it elsewhere. Open sourced under the [GNU GPLv3](https://github.com/lcscout/run01-unity-game/blob/main/LICENSE) license ❤️.
